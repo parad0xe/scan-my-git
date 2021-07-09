@@ -3,10 +3,11 @@ FROM php:8.0.8-alpine3.13
 # Apk install
 RUN apk --no-cache update \
     && apk --no-cache add bash git
-
+    
 # Install pdo
 # (Je l'ai oublié dans la vidéo, c'est important car sans ça vous ne pouvez pas vous connecter à votre base de données)
-RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install mysqli
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
