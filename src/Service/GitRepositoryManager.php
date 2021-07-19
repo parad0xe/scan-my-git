@@ -2,9 +2,9 @@
 namespace App\Service;
 
 use App\Entity\Context;
+use App\Exception\GitException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 
 class GitRepositoryManager {
@@ -18,10 +18,6 @@ class GitRepositoryManager {
         $this->isValid($context);
 
         $DirName = sha1($context->getGithubUrl().$context->getId());
-        // if directory already exist delete it
-        if($filesystem->exists($this->targetDirectory.$DirName)){
-            $this->delete($context);
-        }
 
         $url = $context->getGithubUrl();
 
@@ -35,30 +31,33 @@ class GitRepositoryManager {
         }
 
         //create directory
-        $filesystem->mkdir($this->targetDirectory.$DirName, 0700);
+        $filesystem->mkdir($this->targetDirectory.$DirName, 0666);
+        if(!$filesystem->exists($this->targetDirectory.$DirName)){
+            throw new GitException();
+        }
 
         //clone
         $process = new Process(['git', 'clone', $url, $this->targetDirectory.$DirName]);
         $process->run();
-
-        
-        // $filesystem->chmod( $this->targetDirectory.$DirName, 0666, 0000, true);
         if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+            throw new GitException();
         }
+
+        $filesystem->chmod( $this->targetDirectory.$DirName, 0666, 0000, true);
     }
     public function delete(Context $context){
         //remove from the folder
         $filesystem = new Filesystem();
         $DirName = sha1($context->getGithubUrl().$context->getId());
         $filesystem->remove($this->targetDirectory.$DirName);
-        // $process = new Process(['rm', '-r', $this->targetDirectory.$DirName]);
-        // $process->run();
+        
+        if($filesystem->exists($this->targetDirectory.$DirName)){
+            throw new GitException();
+        }
     }
     public function isValid(Context $context){
         if(!in_array(parse_url($context->getGithubUrl(), PHP_URL_HOST),$this->validHosts)){
-            // throw Exception;
-            return false;
+            throw new GitException();
         }
         return true;
     }
