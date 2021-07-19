@@ -6,8 +6,7 @@ RUN apk --no-cache update \
     
 # Install pdo
 # (Je l'ai oublié dans la vidéo, c'est important car sans ça vous ne pouvez pas vous connecter à votre base de données)
-RUN docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli
+RUN docker-php-ext-install pdo_mysql
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
