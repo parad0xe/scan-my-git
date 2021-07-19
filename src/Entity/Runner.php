@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\ContextModule;
 use App\Repository\RunnerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,10 +40,10 @@ class Runner
     private $analysis;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ModuleContextSetting::class)
+     * @ORM\ManyToOne(targetEntity=ContextModule::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $module_context_setting;
+    private $context_module;
 
     public function getId(): ?int
     {
@@ -97,14 +98,14 @@ class Runner
         return $this;
     }
 
-    public function getModuleContextSetting(): ?ModuleContextSetting
+    public function getContextModule(): ?ContextModule
     {
-        return $this->module_context_setting;
+        return $this->context_module;
     }
 
-    public function setModuleContextSetting(?ModuleContextSetting $module_context_setting): self
+    public function setContextModule(?ContextModule $context_module): self
     {
-        $this->module_context_setting = $module_context_setting;
+        $this->context_module = $context_module;
 
         return $this;
     }

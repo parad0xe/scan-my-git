@@ -28,11 +28,6 @@ class Module
      */
     private $category;
 
-    /**
-     * @ORM\OneToOne(targetEntity=ModuleConfiguration::class, mappedBy="module", cascade={"persist", "remove"})
-     */
-    private $moduleConfiguration;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -58,23 +53,6 @@ class Module
     public function setCategory(?ModuleCategory $category): self
     {
         $this->category = $category;
-
-        return $this;
-    }
-
-    public function getModuleConfiguration(): ?ModuleConfiguration
-    {
-        return $this->moduleConfiguration;
-    }
-
-    public function setModuleConfiguration(ModuleConfiguration $moduleConfiguration): self
-    {
-        // set the owning side of the relation if necessary
-        if ($moduleConfiguration->getModule() !== $this) {
-            $moduleConfiguration->setModule($this);
-        }
-
-        $this->moduleConfiguration = $moduleConfiguration;
 
         return $this;
     }
