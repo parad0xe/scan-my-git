@@ -67,6 +67,7 @@ class Proxy__ModuleEntity__ {
      */
     public function __call(string $name, array $arguments): mixed {
         if (!method_exists($this->module, $name)) {
+            // TODO: Add MethodNotFoundException
             throw new Exception("Method $name Not Found");
         }
 
