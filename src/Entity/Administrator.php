@@ -8,8 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=AdministratorRepository::class)
  */
-class Administrator
-{
+class Administrator {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -28,30 +27,25 @@ class Administrator
      */
     private $admin;
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getPassword(): ?string
-    {
+    public function getPassword(): ?string {
         return $this->password;
     }
 
-    public function setPassword(string $password): self
-    {
+    public function setPassword(string $password): self {
         $this->password = $password;
 
         return $this;
     }
 
-    public function getAdmin(): ?User
-    {
+    public function getAdmin(): ?User {
         return $this->admin;
     }
 
-    public function setAdmin(User $admin): self
-    {
+    public function setAdmin(User $admin): self {
         $this->admin = $admin;
 
         return $this;

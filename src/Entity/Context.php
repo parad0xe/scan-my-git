@@ -10,8 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ContextRepository::class)
  */
-class Context
-{
+class Context {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -30,19 +29,14 @@ class Context
     private $github_url;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $is_private;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $secret_id;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="boolean")
      */
-    private $created_at;
+    private $is_private;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="contexts")
@@ -55,83 +49,75 @@ class Context
      */
     private $analyses;
 
-    public function __construct()
-    {
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
+    private $created_at;
+
+    public function __construct() {
         $this->analyses = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
+    public function setName(string $name): self {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getGithubUrl(): ?string
-    {
+    public function getGithubUrl(): ?string {
         return $this->github_url;
     }
 
-    public function setGithubUrl(string $github_url): self
-    {
+    public function setGithubUrl(string $github_url): self {
         $this->github_url = $github_url;
 
         return $this;
     }
 
-    public function getIsPrivate(): ?bool
-    {
+    public function getIsPrivate(): ?bool {
         return $this->is_private;
     }
 
-    public function setIsPrivate(bool $is_private): self
-    {
+    public function setIsPrivate(bool $is_private): self {
         $this->is_private = $is_private;
 
         return $this;
     }
 
-    public function getSecretId(): ?string
-    {
+    public function getSecretId(): ?string {
         return $this->secret_id;
     }
 
-    public function setSecretId(?string $secret_id): self
-    {
+    public function setSecretId(?string $secret_id): self {
         $this->secret_id = $secret_id;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
+    public function getCreatedAt(): ?\DateTimeImmutable {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
-    {
+    public function setCreatedAt(\DateTimeImmutable $created_at): self {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getOwner(): ?User
-    {
+    public function getOwner(): ?User {
         return $this->owner;
     }
 
-    public function setOwner(?User $owner): self
-    {
+    public function setOwner(?User $owner): self {
         $this->owner = $owner;
 
         return $this;
@@ -140,13 +126,11 @@ class Context
     /**
      * @return Collection|Analysis[]
      */
-    public function getAnalyses(): Collection
-    {
+    public function getAnalyses(): Collection {
         return $this->analyses;
     }
 
-    public function addAnalysis(Analysis $analysis): self
-    {
+    public function addAnalysis(Analysis $analysis): self {
         if (!$this->analyses->contains($analysis)) {
             $this->analyses[] = $analysis;
             $analysis->setContext($this);
@@ -155,8 +139,7 @@ class Context
         return $this;
     }
 
-    public function removeAnalysis(Analysis $analysis): self
-    {
+    public function removeAnalysis(Analysis $analysis): self {
         if ($this->analyses->removeElement($analysis)) {
             // set the owning side to null (unless already changed)
             if ($analysis->getContext() === $this) {

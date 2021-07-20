@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass=ContextModuleRepository::class)
  */
 class ContextModule {
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -39,7 +38,8 @@ class ContextModule {
      */
     private $context;
 
-    public function __construct() { }
+    public function __construct() {
+    }
 
     public function getId(): ?int {
         return $this->id;
@@ -55,37 +55,31 @@ class ContextModule {
         return $this;
     }
 
-    public function getCommand(): ?string
-    {
+    public function getCommand(): ?string {
         return $this->command;
     }
 
-    public function setCommand(string $command): self
-    {
+    public function setCommand(string $command): self {
         $this->command = $command;
 
         return $this;
     }
 
-    public function getParameters(): ?array
-    {
+    public function getParameters(): ?array {
         return $this->parameters;
     }
 
-    public function setParameters(?array $parameters): self
-    {
+    public function setParameters(?array $parameters): self {
         $this->parameters = $parameters;
 
         return $this;
     }
 
-    public function getContext(): ?Context
-    {
+    public function getContext(): ?Context {
         return $this->context;
     }
 
-    public function setContext(?Context $context): self
-    {
+    public function setContext(?Context $context): self {
         $this->context = $context;
 
         return $this;

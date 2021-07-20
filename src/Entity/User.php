@@ -11,8 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  */
-class User
-{
+class User {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -35,23 +34,19 @@ class User
      */
     private $is_deleted = false;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->contexts = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getClientId(): ?string
-    {
+    public function getClientId(): ?string {
         return $this->client_id;
     }
 
-    public function setClientId(string $client_id): self
-    {
+    public function setClientId(string $client_id): self {
         $this->client_id = $client_id;
 
         return $this;
@@ -60,13 +55,11 @@ class User
     /**
      * @return Collection|Context[]
      */
-    public function getContexts(): Collection
-    {
+    public function getContexts(): Collection {
         return $this->contexts;
     }
 
-    public function addContext(Context $context): self
-    {
+    public function addContext(Context $context): self {
         if (!$this->contexts->contains($context)) {
             $this->contexts[] = $context;
             $context->setOwner($this);
@@ -75,8 +68,7 @@ class User
         return $this;
     }
 
-    public function removeContext(Context $context): self
-    {
+    public function removeContext(Context $context): self {
         if ($this->contexts->removeElement($context)) {
             // set the owning side to null (unless already changed)
             if ($context->getOwner() === $this) {
@@ -87,13 +79,11 @@ class User
         return $this;
     }
 
-    public function getIsDeleted(): ?bool
-    {
+    public function getIsDeleted(): ?bool {
         return $this->is_deleted;
     }
 
-    public function setIsDeleted(bool $is_deleted): self
-    {
+    public function setIsDeleted(bool $is_deleted): self {
         $this->is_deleted = $is_deleted;
 
         return $this;
