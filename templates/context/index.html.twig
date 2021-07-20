@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{{ context.name }}</h1>
+
+    {% for module in modules %}
+        <form action="{{ path('context.module.attach', {context_id: context.id, module_id: module.module.id}) }}" method="post">
+            <div class="row mt-4">
+                <h2 class="col-md-12">{{ module.alias }}</h2>
+
+                {% for param in module.cliParameters.parameters %}
+                    {{ module.fb.render(param) | raw }}
+                {% endfor %}
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+        </form>
+    {% endfor %}
+{% endblock %}

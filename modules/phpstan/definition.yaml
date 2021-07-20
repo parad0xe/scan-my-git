@@ -1,0 +1,42 @@
+module:
+    prefix: php
+    executable_name: phpstan.phar
+    alias: PHPStan
+    cli_parameters:
+        value_separator: " "
+
+        parameters:
+            -   identifier: 161849e38a2ba451cb3f0cd21f7cbe5dc578e9cb
+                label: Mode
+                name: false
+                default: analyse
+                required: true
+
+            -   identifier: 225c5014db341a58f48437656ca6f21b7d7a5984
+                label: Level
+                name: -l
+                input:
+                    type: number
+                    attributes: { min: 2, max: 8 }
+                default: 2
+                required: true
+
+            -   identifier: 78517de5370ec92f4b4900b12c95fc3da5a5cdbe
+                label: Log
+                name: --log
+                input:
+                    type: select
+                    select_configuration:
+                        options: [ none, info, warning, error, all ]
+                        selected: warning
+                default: warning
+                required: true
+
+            -   identifier: 6e3a5b7ce64d1fc4fcd2ebe2580ab3daa37675ab
+                label: Path
+                name: false
+                input:
+                    type: text
+                    attributes: { maxlength: 50 }
+                default: src
+                required: true

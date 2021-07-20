@@ -10,8 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ModuleCategoryRepository::class)
  */
-class ModuleCategory
-{
+class ModuleCategory {
+    public const PHP = 'php';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -29,24 +30,20 @@ class ModuleCategory
      */
     private $modules;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->modules = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
+    public function setName(string $name): self {
+        $this->name = strtolower($name);
 
         return $this;
     }
@@ -54,13 +51,11 @@ class ModuleCategory
     /**
      * @return Collection|Module[]
      */
-    public function getModules(): Collection
-    {
+    public function getModules(): Collection {
         return $this->modules;
     }
 
-    public function addModule(Module $module): self
-    {
+    public function addModule(Module $module): self {
         if (!$this->modules->contains($module)) {
             $this->modules[] = $module;
             $module->setCategory($this);
@@ -69,8 +64,7 @@ class ModuleCategory
         return $this;
     }
 
-    public function removeModule(Module $module): self
-    {
+    public function removeModule(Module $module): self {
         if ($this->modules->removeElement($module)) {
             // set the owning side to null (unless already changed)
             if ($module->getCategory() === $this) {

@@ -12,10 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ModuleCategory[]    findAll()
  * @method ModuleCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ModuleCategoryRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
+class ModuleCategoryRepository extends ServiceEntityRepository {
+    public function __construct(ManagerRegistry $registry) {
         parent::__construct($registry, ModuleCategory::class);
     }
 
