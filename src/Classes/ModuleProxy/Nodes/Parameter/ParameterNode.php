@@ -4,6 +4,7 @@ namespace App\Classes\ModuleProxy\Nodes\Parameter;
 
 use App\Classes\ModuleProxy\Nodes\Input\InputDispatcher;
 use App\Classes\ModuleProxy\Nodes\Input\InputNodeInterface;
+use App\Exception\IllegalArgumentException;
 
 class ParameterNode {
     private string $identifier;
@@ -63,12 +64,19 @@ class ParameterNode {
      * @param int|string|null $value
      *
      * @return $this
+     *
+     * @throws IllegalArgumentException
      */
     public function setValue(int | string | null $value): self {
-        $this->value = $value;
-        if ($this->input) {
+        if ($this->hasInput()) {
+            if (!$this->input->validateValue($value)) {
+                throw new IllegalArgumentException("Illegal value for argument $this->label [$this->identifier]");
+            }
+
             $this->input->setValue($value);
         }
+
+        $this->value = $value;
 
         return $this;
     }

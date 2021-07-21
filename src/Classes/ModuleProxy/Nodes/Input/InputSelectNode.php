@@ -22,7 +22,7 @@ class InputSelectNode extends AbstractInputNode {
                 required='$this->required'>
         HTML;
 
-        foreach ($this->options as $k => $option) {
+        foreach ($this->options as $option) {
             if ($this->value) {
                 $selected = ($option === $this->value) ? "selected='selected'" : '';
             } else {
@@ -47,5 +47,9 @@ class InputSelectNode extends AbstractInputNode {
                 {$this->getHTMLField($module_id)}
             </div>
         HTML;
+    }
+
+    public function validateValue(int | string | null $value): bool {
+        return in_array($value, $this->options);
     }
 }

@@ -14,4 +14,6 @@ interface InputNodeInterface {
     public function getType(): string;
 
     public function setValue(int | string | null $value): InputNodeInterface;
+
+    public function validateValue(int | string | null $value): bool;
 }

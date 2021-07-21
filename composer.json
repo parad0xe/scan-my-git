@@ -19,6 +19,7 @@
         "symfony/form": "5.3.*",
         "symfony/framework-bundle": "5.3.*",
         "symfony/http-foundation": "5.3.*",
+        "symfony/monolog-bundle": "^3.7",
         "symfony/proxy-manager-bridge": "5.3.*",
         "symfony/runtime": "5.3.*",
         "symfony/security-core": "5.3.*",
@@ -64,9 +65,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "php-lint": "composer php-lint-diff",
-        "php-lint-diff": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --using-cache=no --diff",
-        "php-lint-apply": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no --diff"
+        "lint:check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --using-cache=no --diff",
+        "lint:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no --diff"
     },
     "conflict": {
         "symfony/symfony": "*"

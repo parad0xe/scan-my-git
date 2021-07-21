@@ -6,16 +6,19 @@ use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 use App\Entity\Context;
 use App\Entity\ContextModule;
 use App\Entity\Module;
+use App\Exception\FileNotFoundException;
+use App\Exception\IllegalArgumentException;
 use App\Repository\ContextModuleRepository;
 use App\Repository\ModuleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class ModuleManager {
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ModuleRepository $moduleRepository,
-        private ContextModuleRepository $contextModuleRepository
+        private ContextModuleRepository $contextModuleRepository,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -23,22 +26,26 @@ class ModuleManager {
     public function loadAll(Context $context = null): array {
         $modules = $this->moduleRepository->findAll();
 
-        return array_map(function (Module $module) use ($context) {
-            return $this->load($module->getId(), $context);
-        }, $modules);
+        return array_reduce($modules, function (array $a, Module $module) use ($context) {
+            $module = $this->load($module->getId(), $context);
+
+            if ($module) {
+                $a[] = $module;
+            }
+
+            return $a;
+        }, []);
     }
 
     /**
      * Load a module with a specific ID or specific criteria.
      *
      * @param array|int    $criteria module id or array of criteria
-     * @param Context|null $context specify the context for load definition data saved in database
-     *
-     * @return Proxy__ModuleEntity__|null
+     * @param Context|null $context  specify the context for load definition data saved in database
      */
-    public function load(array|int $criteria, Context $context = null): ?Proxy__ModuleEntity__ {
+    public function load(array | int $criteria, Context $context = null): ?Proxy__ModuleEntity__ {
         if (is_int($criteria)) {
-            $criteria = ["id" => $criteria];
+            $criteria = ['id' => $criteria];
         }
 
         $module = $this->moduleRepository->findOneBy($criteria);
@@ -47,13 +54,25 @@ class ModuleManager {
             return null;
         }
 
-        $proxy__ModuleEntity__ = new Proxy__ModuleEntity__($module);
+        try {
+            $proxy__ModuleEntity__ = new Proxy__ModuleEntity__($module);
+        } catch (FileNotFoundException $e) {
+            $this->logger->error($e->getMessage());
+
+            return null;
+        }
 
         if ($context) {
             $context_module = $this->contextModuleRepository->findOneBy(['context' => $context, 'module' => $module]);
 
             if ($context_module) {
-                $proxy__ModuleEntity__->getCliParameters()->bind($context_module->getParameters());
+                try {
+                    $proxy__ModuleEntity__->getCliParameters()->bind($context_module->getParameters());
+                } catch (IllegalArgumentException $e) {
+                    $this->logger->error($e->getMessage());
+
+                    return null;
+                }
             }
         }
 
@@ -80,6 +99,8 @@ class ModuleManager {
         $this->entityManager->persist($context_module);
         $this->entityManager->flush();
 
+        $this->entityManager->refresh($context);
+
         return $context_module;
     }
 
@@ -95,5 +116,7 @@ class ModuleManager {
 
         $this->entityManager->remove($context_module);
         $this->entityManager->flush();
+
+        $this->entityManager->refresh($context);
     }
 }

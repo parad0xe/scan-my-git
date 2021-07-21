@@ -3,6 +3,7 @@
 namespace App\Classes\ModuleProxy\Nodes;
 
 use App\Classes\ModuleProxy\Nodes\Parameter\ParameterNode;
+use App\Exception\IllegalArgumentException;
 
 class CliParametersNode {
     private string $prefix;
@@ -44,10 +45,12 @@ class CliParametersNode {
         }, []);
     }
 
+    /**
+     * @throws IllegalArgumentException
+     */
     public function bind(array $external_params) {
         foreach ($this->parameters as $parameter) {
             if (array_key_exists($parameter->getIdentifier(), $external_params)) {
-                // TODO: Validate external data before set value (SECURITY BREACH: XSS)
                 $parameter->setValue($external_params[$parameter->getIdentifier()]);
             }
         }
@@ -67,6 +70,6 @@ class CliParametersNode {
             return implode($this->getValueSeparator(), [$parameterNode->getName(), $parameterNode->getValue()]);
         }, $this->parameters));
 
-        return trim($command, ' ');
+        return escapeshellcmd(trim($command, ' '));
     }
 }

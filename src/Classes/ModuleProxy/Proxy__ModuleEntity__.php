@@ -4,7 +4,8 @@ namespace App\Classes\ModuleProxy;
 
 use App\Classes\ModuleProxy\Nodes\CliParametersNode;
 use App\Entity\Module;
-use Exception;
+use App\Exception\FileNotFoundException;
+use App\Exception\MethodNotFoundException;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -17,9 +18,16 @@ class Proxy__ModuleEntity__ {
     private CliParametersNode $cli_parameters;
     private FormBuilder $fb;
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function __construct(
         private Module $module
     ) {
+        if (!file_exists($module->getDefinitionFile())) {
+            throw new FileNotFoundException("The definition file {$module->getDefinitionFile()} Not Exist");
+        }
+
         $definition = (new Processor())->process(
             $this->getModuleDefinitionStructure(),
             Yaml::parseFile($module->getDefinitionFile())
@@ -63,12 +71,11 @@ class Proxy__ModuleEntity__ {
     }
 
     /**
-     * @throws Exception
+     * @throws MethodNotFoundException
      */
     public function __call(string $name, array $arguments): mixed {
         if (!method_exists($this->module, $name)) {
-            // TODO: Add MethodNotFoundException
-            throw new Exception("Method $name Not Found");
+            throw new MethodNotFoundException("Method $name Not Found");
         }
 
         return call_user_func_array([$this->module, $name], $arguments);
@@ -98,6 +105,7 @@ class Proxy__ModuleEntity__ {
                                             ->arrayNode('attributes')
                                                 ->children()
                                                     ->scalarNode('maxlength')->cannotBeEmpty()->end()
+                                                    ->scalarNode('minlength')->cannotBeEmpty()->end()
                                                     ->integerNode('min')->end()
                                                     ->integerNode('max')->end()
                                                 ->end()
