@@ -96,7 +96,7 @@ class ContextController extends AbstractController {
         
 
         //create modulecontext
-        foreach (['php-security-checker'] as $module_name) {
+        foreach (['php-security-checker', 'phpstan'] as $module_name) {
             $module = $moduleManager->load(['name' => $module_name]);
             if (!$module) {
                 continue;

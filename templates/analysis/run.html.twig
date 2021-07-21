@@ -8,7 +8,39 @@
 <script defer>
     const analysis_hash = '{{ analysis.hash }}';
     const runners_id = JSON.parse('{{ runners_id | json_encode }}');
+    //route '/run/{analysis_hash}/{runner_id}'
     console.log(analysis_hash);
     console.log(runners_id);
+
+    const promises = runners_id.map((runner_id) => {
+        const myInit = { method: 'POST',
+            headers: {
+                'Content-Type': 'json'
+            },
+            mode: 'cors',
+            cache: 'default' 
+        };
+
+        const request = new Request(`/runner/run/${analysis_hash}/${runner_id}`, myInit);
+
+        return new Promise((resolve) => {
+            fetch(request)
+            .then((response) => {
+                response.json().then((data) => {
+                    if(data.success){
+                        console.log(data);
+                    }else{
+                        console.log("t'as foiré");
+                    }
+                    resolve();
+                })
+            })
+            .catch((error) => {
+                console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
+            });
+        })
+    })
+    Promise.all(promises).then(() => {console.log("finished")});
+
 </script>
 {% endblock %}
