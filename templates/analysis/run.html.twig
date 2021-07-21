@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block title %}Analysis Running{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block javascripts %}
+<script defer>
+    const analysis_hash = '{{ analysis.hash }}';
+    const runners_id = JSON.parse('{{ runners_id | json_encode }}');
+    console.log(analysis_hash);
+    console.log(runners_id);
+</script>
+{% endblock %}
