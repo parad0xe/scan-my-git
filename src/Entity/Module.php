@@ -52,7 +52,7 @@ class Module {
     }
 
     public function getPath(): ?string {
-        return __DIR__."/../../modules/{$this->name}";
+        return realpath(__DIR__."/../../modules") . "/{$this->name}";
     }
 
     public function getDefinitionFile(): ?string {
