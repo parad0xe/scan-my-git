@@ -25,7 +25,7 @@ class Proxy__ModuleEntity__ {
         private Module $module
     ) {
         if (!file_exists($module->getDefinitionFile())) {
-            throw new FileNotFoundException("The definition file {$module->getDefinitionFile()} Not Exist");
+            throw new FileNotFoundException("The definition file ({$module->getDefinitionFile()}) does not exist");
         }
 
         $definition = (new Processor())->process(
@@ -75,7 +75,7 @@ class Proxy__ModuleEntity__ {
      */
     public function __call(string $name, array $arguments): mixed {
         if (!method_exists($this->module, $name)) {
-            throw new MethodNotFoundException("Method $name Not Found");
+            throw new MethodNotFoundException("Module method ($name) not found");
         }
 
         return call_user_func_array([$this->module, $name], $arguments);

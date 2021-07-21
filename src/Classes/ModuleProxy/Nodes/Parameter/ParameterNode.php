@@ -70,7 +70,7 @@ class ParameterNode {
     public function setValue(int | string | null $value): self {
         if ($this->hasInput()) {
             if (!$this->input->validateValue($value)) {
-                throw new IllegalArgumentException("Illegal value for argument $this->label [$this->identifier]");
+                throw new IllegalArgumentException("Illegal value for argument ($value) for $this->label [$this->identifier]");
             }
 
             $this->input->setValue($value);
