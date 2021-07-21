@@ -2,21 +2,20 @@
 
 namespace App\Service;
 
-use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
+use App\Entity\Module;
 use App\Entity\Context;
 use App\Entity\ContextModule;
-use App\Entity\Module;
-use App\Repository\ContextModuleRepository;
 use App\Repository\ModuleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ContextModuleRepository;
+use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 
 class ModuleManager {
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ModuleRepository $moduleRepository,
         private ContextModuleRepository $contextModuleRepository
-    ) {
+        ) {
     }
 
     /** @return Proxy__ModuleEntity__[] */
@@ -32,13 +31,11 @@ class ModuleManager {
      * Load a module with a specific ID or specific criteria.
      *
      * @param array|int    $criteria module id or array of criteria
-     * @param Context|null $context specify the context for load definition data saved in database
-     *
-     * @return Proxy__ModuleEntity__|null
+     * @param Context|null $context  specify the context for load definition data saved in database
      */
-    public function load(array|int $criteria, Context $context = null): ?Proxy__ModuleEntity__ {
+    public function load(array | int $criteria, Context $context = null): ?Proxy__ModuleEntity__ {
         if (is_int($criteria)) {
-            $criteria = ["id" => $criteria];
+            $criteria = ['id' => $criteria];
         }
 
         $module = $this->moduleRepository->findOneBy($criteria);
@@ -79,7 +76,7 @@ class ModuleManager {
 
         $this->entityManager->persist($context_module);
         $this->entityManager->flush();
-
+        $this->entityManager->refresh($context);
         return $context_module;
     }
 

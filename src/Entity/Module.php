@@ -53,14 +53,12 @@ class Module {
     }
 
     #[Pure]
-    public function getPath(): ?string
-    {
-        return __DIR__ . "/../../modules/{$this->name}";
+    public function getPath(): ?string {
+        return __DIR__."/../../modules/{$this->name}";
     }
 
     #[Pure]
-    public function getDefinitionFile(): ?string
-    {
-        return  "{$this->getPath()}/definition.yaml";
+    public function getDefinitionFile(): ?string {
+        return "{$this->getPath()}/definition.yaml";
     }
 }

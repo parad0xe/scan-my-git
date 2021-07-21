@@ -1,4 +1,6 @@
 <?php
+
 namespace App\Exception;
 
-class GitException extends \Exception{}
+class GitException extends \Exception {
+}
