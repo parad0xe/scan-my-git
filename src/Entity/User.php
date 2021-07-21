@@ -2,16 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  */
-class User {
+class User implements UserInterface{
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -22,7 +23,7 @@ class User {
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $client_id;
+    private $githubId;
 
     /**
      * @ORM\OneToMany(targetEntity=Context::class, mappedBy="owner")
@@ -42,12 +43,12 @@ class User {
         return $this->id;
     }
 
-    public function getClientId(): ?string {
-        return $this->client_id;
+    public function getGithubId(): ?string {
+        return $this->githubId;
     }
 
-    public function setClientId(string $client_id): self {
-        $this->client_id = $client_id;
+    public function setGithubId(string $githubId): self {
+        $this->githubId = $githubId;
 
         return $this;
     }
@@ -88,4 +89,12 @@ class User {
 
         return $this;
     }
+
+    public function getRoles() {  }
+    public function eraseCredentials() {}
+    public function getSalt() {}
+    public function getUserIdentifier() {}
+    public function getUsername() {}
+    public function getPassword() {}
+
 }

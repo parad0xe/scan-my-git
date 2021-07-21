@@ -84,4 +84,12 @@ class ContextController extends AbstractController {
         return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
 //        return new JsonResponse(["success" => true]);
     }
+
+    #[Route('/quick-analysis', name: 'context.quick-analysis', methods: ['GET'])]
+    public function quickAnalysis(): Response {
+        
+
+        return new Response();
+//        return new JsonResponse(["success" => true]);
+    }
 }

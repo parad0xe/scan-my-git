@@ -1,3 +1,7 @@
 index:
     path: /
     controller: App\Controller\HomeController::index
+
+# oauth_check:
+#     path: /connect/check/{service}
+#     controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
