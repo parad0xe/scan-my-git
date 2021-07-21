@@ -3,6 +3,25 @@
 {% block title 'Scan My Git' %}
 
 {% block body %}
+    <h1>Home</h1>
+
+    <div>
+        <form action="{{ path('context.quick-analysis') }}" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="github_url" class="form-label"></label>
+                        <input id="github_url" type="url" name="github_url" class="form-control">
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Quick Analysis</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
     <div id="app"></div>
 {% endblock %}
 

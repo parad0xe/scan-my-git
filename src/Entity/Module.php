@@ -8,8 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ModuleRepository::class)
  */
-class Module
-{
+class Module {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -18,7 +17,7 @@ class Module
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100, unique=true)
      */
     private $name;
 
@@ -28,32 +27,35 @@ class Module
      */
     private $category;
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
+    public function setName(string $name): self {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getCategory(): ?ModuleCategory
-    {
+    public function getCategory(): ?ModuleCategory {
         return $this->category;
     }
 
-    public function setCategory(?ModuleCategory $category): self
-    {
+    public function setCategory(?ModuleCategory $category): self {
         $this->category = $category;
 
         return $this;
+    }
+
+    public function getPath(): ?string {
+        return __DIR__."/../../modules/{$this->name}";
+    }
+
+    public function getDefinitionFile(): ?string {
+        return "{$this->getPath()}/definition.yaml";
     }
 }

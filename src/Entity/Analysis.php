@@ -10,8 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=AnalysisRepository::class)
  */
-class Analysis
-{
+class Analysis {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -45,59 +44,49 @@ class Analysis
      */
     private $runners;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->runners = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getScore(): ?int
-    {
+    public function getScore(): ?int {
         return $this->score;
     }
 
-    public function setScore(int $score): self
-    {
+    public function setScore(int $score): self {
         $this->score = $score;
 
         return $this;
     }
 
-    public function getStartedAt(): ?\DateTimeImmutable
-    {
+    public function getStartedAt(): ?\DateTimeImmutable {
         return $this->started_at;
     }
 
-    public function setStartedAt(\DateTimeImmutable $started_at): self
-    {
+    public function setStartedAt(\DateTimeImmutable $started_at): self {
         $this->started_at = $started_at;
 
         return $this;
     }
 
-    public function getFinishedAt(): ?\DateTimeImmutable
-    {
+    public function getFinishedAt(): ?\DateTimeImmutable {
         return $this->finished_at;
     }
 
-    public function setFinishedAt(\DateTimeImmutable $finished_at): self
-    {
+    public function setFinishedAt(\DateTimeImmutable $finished_at): self {
         $this->finished_at = $finished_at;
 
         return $this;
     }
 
-    public function getContext(): ?Context
-    {
+    public function getContext(): ?Context {
         return $this->context;
     }
 
-    public function setContext(?Context $context): self
-    {
+    public function setContext(?Context $context): self {
         $this->context = $context;
 
         return $this;
@@ -106,13 +95,11 @@ class Analysis
     /**
      * @return Collection|Runner[]
      */
-    public function getRunners(): Collection
-    {
+    public function getRunners(): Collection {
         return $this->runners;
     }
 
-    public function addRunner(Runner $runner): self
-    {
+    public function addRunner(Runner $runner): self {
         if (!$this->runners->contains($runner)) {
             $this->runners[] = $runner;
             $runner->setAnalysis($this);
@@ -121,8 +108,7 @@ class Analysis
         return $this;
     }
 
-    public function removeRunner(Runner $runner): self
-    {
+    public function removeRunner(Runner $runner): self {
         if ($this->runners->removeElement($runner)) {
             // set the owning side to null (unless already changed)
             if ($runner->getAnalysis() === $this) {

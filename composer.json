@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "composer/package-versions-deprecated": "1.11.99.2",
@@ -19,6 +19,7 @@
         "symfony/form": "5.3.*",
         "symfony/framework-bundle": "5.3.*",
         "symfony/http-foundation": "5.3.*",
+        "symfony/monolog-bundle": "^3.7",
         "symfony/proxy-manager-bridge": "5.3.*",
         "symfony/runtime": "5.3.*",
         "symfony/security-core": "5.3.*",
@@ -55,7 +56,7 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd",
+            "cache:clear --no-warmup": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
@@ -64,7 +65,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "php-lint": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --using-cache=no --diff"
+        "lint:check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --using-cache=no --diff",
+        "lint:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no --diff"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -76,6 +78,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "friendsofphp/php-cs-fixer": "^3.0",
         "symfony/maker-bundle": "^1.33",
         "symfony/phpunit-bridge": "^5.3",
