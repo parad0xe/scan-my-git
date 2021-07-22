@@ -50,8 +50,10 @@ class GitRepositoryManager {
 
         //clone
         $process = new Process(['git', 'clone', $url, $this->targetDirectory.$DirName]);
+        // $process = new Process(['git', 'clone', '--config', 'core.filemode=false', $url, $this->targetDirectory.$DirName]);
+        // $process = new Process(['git']);
         try {
-            $process->setTimeout(10);
+            $process->setTimeout(30);
             $process->mustRun();
         } catch (ProcessFailedException $e) {
             $this->logger->error($e->getMessage());
@@ -62,11 +64,11 @@ class GitRepositoryManager {
         }
 
         //change rights
-        try {
-            $filesystem->chmod($this->targetDirectory.$DirName, 0666, 0000, true);
-        } catch (IOException $e) {
-            $this->logger->warning($e->getMessage());
-        }
+        // try {
+        //     $filesystem->chmod($this->targetDirectory.$DirName, 0666, 0000, true);
+        // } catch (IOException $e) {
+        //     $this->logger->warning($e->getMessage());
+        // }
 
         return true;
     }

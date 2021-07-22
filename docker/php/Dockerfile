@@ -5,6 +5,7 @@ RUN apk --no-cache update \
     && apk --no-cache add \
     	bash \
     	git \
+		shadow \
     	php8-fpm \
 		php8-ctype \
 		php8-curl \
@@ -53,6 +54,14 @@ RUN wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer \
 COPY symfony.ini /etc/php8/conf.d/
 COPY symfony.ini /etc/php8/cli/conf.d/
 COPY symfony.pool.conf /etc/php8/php-fpm.d/
+
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
+
+RUN groupmod -o -g ${PGID} www-data && \
+    usermod -o -u ${PUID} -g www-data www-data
 
 WORKDIR /var/www/html
 

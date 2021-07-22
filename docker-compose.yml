@@ -33,14 +33,10 @@ services:
             - 3000:8080
         depends_on:
             - php-fpm
-#        environment:
-#            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
-#            - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
-#            - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
         volumes:
             - ./:/var/www/html
             - ./logs/nginx:/var/log/nginx
-
+        
 
     database:
         image: 'mariadb:latest'
@@ -49,8 +45,4 @@ services:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: scan_my_git
         ports:
-            # To allow the host machine to access the ports below, modify the lines below.
-            # For example, to allow the host to connect to port 3306 on the container, you would change
-            # "3306" to "3306:3306". Where the first port is exposed to the host and the second is the container port.
-            # See https://docs.docker.com/compose/compose-file/#ports for more information.
             - '3306'
