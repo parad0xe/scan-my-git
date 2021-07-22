@@ -1,17 +1,20 @@
 version: '3.8'
 
 services:
-    app:
-        tty: true
-        container_name: app
-        build: ./
+    php-fpm:
+        container_name: php-fpm
+        build:
+            context: ./docker/php
         ports:
-            - 3000:8000
+            - 9000:9001
         volumes:
             - ./:/var/www/html
+        depends_on:
+            -   database
 
     phpmyadmin:
         image: phpmyadmin
+        container_name: phpmyadmin
         restart: always
         ports:
             - 8080:80
@@ -21,8 +24,27 @@ services:
             - PMA_USER=root
             - PMA_PASSWORD=root
 
+    nginx:
+        tty: true
+        container_name: nginx
+        build:
+            context: ./docker/nginx
+        ports:
+            - 3000:8080
+        depends_on:
+            - php-fpm
+#        environment:
+#            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+#            - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+#            - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
+        volumes:
+            - ./:/var/www/html
+            - ./logs/nginx:/var/log/nginx
+
+
     database:
         image: 'mariadb:latest'
+        container_name: database
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: scan_my_git
