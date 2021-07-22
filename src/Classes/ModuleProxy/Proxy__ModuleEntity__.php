@@ -39,7 +39,7 @@ class Proxy__ModuleEntity__ {
 
         $this->cli_parameters = new CliParametersNode(
             $this->prefix,
-            $this->executable_name,
+            "{$this->module->getPath()}/$this->executable_name",
             $definition['cli_parameters']
         );
 
