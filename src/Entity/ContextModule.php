@@ -61,7 +61,7 @@ class ContextModule {
     }
 
     public function setCommand(string $command): self {
-        $this->command = $command;
+        $this->command = escapeshellcmd($command);
 
         return $this;
     }

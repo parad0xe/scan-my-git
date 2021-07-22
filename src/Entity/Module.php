@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\ModuleRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * @ORM\Entity(repositoryClass=ModuleRepository::class)
@@ -52,12 +51,10 @@ class Module {
         return $this;
     }
 
-    #[Pure]
     public function getPath(): ?string {
-        return __DIR__."/../../modules/{$this->name}";
+        return realpath(__DIR__."/../../modules") . "/{$this->name}";
     }
 
-    #[Pure]
     public function getDefinitionFile(): ?string {
         return "{$this->getPath()}/definition.yaml";
     }

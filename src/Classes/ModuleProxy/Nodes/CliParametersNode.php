@@ -3,19 +3,20 @@
 namespace App\Classes\ModuleProxy\Nodes;
 
 use App\Classes\ModuleProxy\Nodes\Parameter\ParameterNode;
+use App\Exception\IllegalArgumentException;
 
 class CliParametersNode {
     private string $prefix;
-    private string $executale_name;
+    private string $executable;
 
     private string $value_separator;
 
     /** @var ParameterNode[] */
     private array $parameters;
 
-    public function __construct(string $prefix, string $executable_name, array $parameters) {
+    public function __construct(string $prefix, string $executable, array $parameters) {
         $this->prefix = $prefix;
-        $this->executale_name = $executable_name;
+        $this->executable = $executable;
 
         $this->value_separator = $parameters['value_separator'];
 
@@ -44,17 +45,19 @@ class CliParametersNode {
         }, []);
     }
 
+    /**
+     * @throws IllegalArgumentException
+     */
     public function bind(array $external_params) {
         foreach ($this->parameters as $parameter) {
             if (array_key_exists($parameter->getIdentifier(), $external_params)) {
-                // TODO: Validate external data before set value (SECURITY BREACH: XSS)
                 $parameter->setValue($external_params[$parameter->getIdentifier()]);
             }
         }
     }
 
     public function generateCommand(): string {
-        $command = "$this->prefix $this->executale_name";
+        $command = "$this->prefix $this->executable";
 
         $command .= ' '.implode(' ', array_map(function (ParameterNode $parameterNode): string {
             if (is_null($parameterNode->getValue()) || false === $parameterNode->getValue()) {
@@ -67,6 +70,6 @@ class CliParametersNode {
             return implode($this->getValueSeparator(), [$parameterNode->getName(), $parameterNode->getValue()]);
         }, $this->parameters));
 
-        return trim($command, ' ');
+        return escapeshellcmd(trim($command, ' '));
     }
 }

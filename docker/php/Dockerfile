@@ -2,11 +2,35 @@ FROM php:8.0.8-alpine3.13
 
 # Apk install
 RUN apk --no-cache update \
-    && apk --no-cache add bash git
-    
-# Install pdo
-# (Je l'ai oublié dans la vidéo, c'est important car sans ça vous ne pouvez pas vous connecter à votre base de données)
-RUN docker-php-ext-install pdo_mysql
+    && apk --no-cache add \
+    	bash \
+    	git \
+    	php8-fpm \
+		php8-ctype \
+		php8-curl \
+		php8-dom \
+		php8-gd \
+		php8-iconv \
+		php8-json \
+		php8-intl \
+		php8-fileinfo\
+		php8-mbstring \
+		php8-opcache \
+		php8-openssl \
+		php8-pdo \
+		php8-pdo_mysql \
+		php8-mysqli \
+		php8-xml \
+		php8-xsl \
+		php8-zlib \
+		php8-phar \
+		php8-tokenizer \
+		php8-session \
+		php8-simplexml \
+		php8-zip \
+		php8-xmlwriter \
+		php8-sodium \
+		php8-pecl-apcu
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
@@ -18,14 +42,20 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 RUN wget https://get.symfony.com/cli/installer -O - | bash \
     && mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
+# NodeJS / NPM
 RUN apk add --update nodejs npm
 
 RUN wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer \
     && chmod a+x php-cs-fixer \
     && mv php-cs-fixer /usr/local/bin/php-cs-fixer
 
+# Symfony PHP Conf
+COPY symfony.ini /etc/php8/conf.d/
+COPY symfony.ini /etc/php8/cli/conf.d/
+COPY symfony.pool.conf /etc/php8/php-fpm.d/
+
 WORKDIR /var/www/html
 
-CMD composer install \
-    && npm install \
-    && symfony server:start
+CMD ["php-fpm8", "-F"]
+
+EXPOSE 9001

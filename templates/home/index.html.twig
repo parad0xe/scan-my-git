@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Home{% endblock %}
+{% block title 'Scan My Git' %}
 
 {% block body %}
     <h1>Home</h1>
@@ -21,4 +21,10 @@
             </div>
         </form>
     </div>
+    
+    <div id="app"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}

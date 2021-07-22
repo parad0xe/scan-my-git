@@ -4,9 +4,12 @@ namespace App\Service;
 
 use App\Entity\Module;
 use App\Entity\Context;
+use Psr\Log\LoggerInterface;
 use App\Entity\ContextModule;
 use App\Repository\ModuleRepository;
+use App\Exception\FileNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\IllegalArgumentException;
 use App\Repository\ContextModuleRepository;
 use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 
@@ -14,17 +17,24 @@ class ModuleManager {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ModuleRepository $moduleRepository,
-        private ContextModuleRepository $contextModuleRepository
-        ) {
+        private ContextModuleRepository $contextModuleRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /** @return Proxy__ModuleEntity__[] */
     public function loadAll(Context $context = null): array {
         $modules = $this->moduleRepository->findAll();
 
-        return array_map(function (Module $module) use ($context) {
-            return $this->load($module->getId(), $context);
-        }, $modules);
+        return array_reduce($modules, function (array $a, Module $module) use ($context) {
+            $module = $this->load($module->getId(), $context);
+
+            if ($module) {
+                $a[] = $module;
+            }
+
+            return $a;
+        }, []);
     }
 
     /**
@@ -44,13 +54,25 @@ class ModuleManager {
             return null;
         }
 
-        $proxy__ModuleEntity__ = new Proxy__ModuleEntity__($module);
+        try {
+            $proxy__ModuleEntity__ = new Proxy__ModuleEntity__($module);
+        } catch (FileNotFoundException $e) {
+            $this->logger->error($e->getMessage());
+
+            return null;
+        }
 
         if ($context) {
             $context_module = $this->contextModuleRepository->findOneBy(['context' => $context, 'module' => $module]);
 
             if ($context_module) {
-                $proxy__ModuleEntity__->getCliParameters()->bind($context_module->getParameters());
+                try {
+                    $proxy__ModuleEntity__->getCliParameters()->bind($context_module->getParameters());
+                } catch (IllegalArgumentException $e) {
+                    $this->logger->error($e->getMessage());
+
+                    return null;
+                }
             }
         }
 
@@ -76,7 +98,9 @@ class ModuleManager {
 
         $this->entityManager->persist($context_module);
         $this->entityManager->flush();
+
         $this->entityManager->refresh($context);
+
         return $context_module;
     }
 
@@ -92,5 +116,7 @@ class ModuleManager {
 
         $this->entityManager->remove($context_module);
         $this->entityManager->flush();
+
+        $this->entityManager->refresh($context);
     }
 }

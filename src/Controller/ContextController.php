@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\Runner;
 use App\Entity\Context;
 use App\Entity\Analysis;
-use App\Service\ModuleManager;
+use App\Exception\IllegalArgumentException;
 use App\Repository\ContextRepository;
+use App\Service\ModuleManager;
 use App\Service\GitRepositoryManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,9 +19,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/context')]
 class ContextController extends AbstractController {
-    #[Route('/{context_id}', name: 'context.index', methods: ['GET'])]
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
+    }
+
+    #[Route('/{context_id}', name: 'context.index', requirements: ['context_id' => '\d+'], methods: ['GET'])]
     public function index(ModuleManager $moduleManager, ContextRepository $contextRepository, int $context_id): Response {
         $context = $contextRepository->find($context_id);
+
+        if (!$context) {
+            $this->addFlash('error', 'Aucun contexte associé');
+
+            return $this->redirectToRoute('home');
+        }
+
         $modules = $moduleManager->loadAll($context);
 
         return $this->render('context/index.html.twig', [
@@ -30,8 +44,8 @@ class ContextController extends AbstractController {
 
     #[Route('/create', name: 'context.create', methods: ['GET'])]
     public function create(EntityManagerInterface $entityManager): Response {
-        $context = new Context();
-        $context->setName('My Custom Context')
+        $context = (new Context())
+            ->setName('My Custom Context')
             ->setGithubUrl('https://github.com')
             ->setIsPrivate(false);
 
@@ -48,7 +62,14 @@ class ContextController extends AbstractController {
 
         $data = $request->request->get('module')[$module_id];
 
-        $module->getCliParameters()->bind($data);
+        try {
+            $module->getCliParameters()->bind($data);
+        } catch (IllegalArgumentException $e) {
+            $this->logger->error($e->getMessage());
+            $this->addFlash('error', 'Argument invalide');
+
+            return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
+        }
 
         $moduleManager->attach($context, $module);
 

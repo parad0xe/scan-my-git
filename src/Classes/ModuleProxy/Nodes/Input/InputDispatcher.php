@@ -25,7 +25,7 @@ class InputDispatcher {
                 $parameterNode->isRequired(),
                 $data
             ),
-            default => false,
+            default => null,
         };
     }
 }
