@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User context{% endblock %}
+{% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
 
 {% if is_granted('ROLE_USER') %}
 
-            Hello {{ user.username }}!
-           <a href="{{ path('app_logout') }}">Logout</a>
+            Bonjour {{ username }}!
+           <a href="{{ path('app_logout') }}">Déconnexion</a>
 
             {% else %} 
             <p>Erreur 404</p>

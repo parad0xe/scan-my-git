@@ -2,19 +2,18 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  */
-class User implements UserInterface{
+class User implements UserInterface {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -108,50 +107,50 @@ class User implements UserInterface{
         return $this;
     }
 
-    public function getRoles() {  
+    public function getRoles() {
         return ['ROLE_USER'];
     }
-    public function eraseCredentials() {}
-    public function getSalt() {}
+
+    public function eraseCredentials() {
+    }
+
+    public function getSalt() {
+    }
+
     public function getUserIdentifier() {
         return $this->githubId;
     }
+
     public function getUsername() {
         return $this->username;
     }
-    public function getPassword() {}
 
-    public function getLastRegisteredAt(): ?\DateTimeImmutable
-    {
+    public function getPassword() {
+    }
+
+    public function getLastRegisteredAt(): ?\DateTimeImmutable {
         return $this->last_registered_at;
     }
 
-    public function setLastRegisteredAt(\DateTimeImmutable $last_registered_at): self
-    {
+    public function setLastRegisteredAt(\DateTimeImmutable $last_registered_at): self {
         $this->last_registered_at = $last_registered_at;
 
         return $this;
     }
 
-    public function getGithubToken(): ?string
-    {
+    public function getGithubToken(): ?string {
         return $this->github_token;
     }
 
-    public function setGithubToken(string $github_token): self
-    {
+    public function setGithubToken(string $github_token): self {
         $this->github_token = $github_token;
 
         return $this;
     }
 
-    public function setUsername(string $username): self
-    {
+    public function setUsername(string $username): self {
         $this->username = $username;
 
         return $this;
     }
-
-   
-
 }

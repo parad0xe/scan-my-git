@@ -6,7 +6,7 @@ import "react";
 const App: React.FC = () => {
   return (
     <>
-      <p>Test</p>
+      <p>React App Component</p>
     </>
   );
 };

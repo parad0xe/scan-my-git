@@ -87,8 +87,6 @@ class ContextController extends AbstractController {
 
     #[Route('/quick-analysis', name: 'context.quick-analysis', methods: ['GET'])]
     public function quickAnalysis(): Response {
-        
-
         return new Response();
 //        return new JsonResponse(["success" => true]);
     }
