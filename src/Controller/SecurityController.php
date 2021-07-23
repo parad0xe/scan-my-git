@@ -2,12 +2,10 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
@@ -34,25 +32,16 @@ class SecurityController extends AbstractController
      */
     public function connect(ClientRegistry $clientRegistry) {
         $client = $clientRegistry->getClient('github');
-        return $client->redirect(['repo'],[]);
+        return $client->redirect(['read:user','repo'],[]);
     }
 
-     /**
-     * @Route("/connect/check/github", name="github_check_connect")
+    /**
+     * @Route("/connect/github/result", name="oauth_check")
      */
     public function check(ClientRegistry $clientRegistry) {
         $client = $clientRegistry->getClient('github');
-        try {
-            $accessToken = $client->getAccessToken();
-            $user = $client->fetchUserFromToken($accessToken);
-            dd($user, $accessToken);
-          } catch (IdentityProviderException $e) {
-            dd($e->getMessage());
-          }
+       return $this->redirectToRoute('home');
     }
-
-
-    
 
     /**
      * @Route("/logout", name="app_logout")
@@ -60,5 +49,6 @@ class SecurityController extends AbstractController
     public function logout()
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        return $this->redirectToRoute('home');
     }
 }

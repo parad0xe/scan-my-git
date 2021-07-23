@@ -7,6 +7,8 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -34,6 +36,22 @@ class User implements UserInterface{
      * @ORM\Column(type="boolean")
      */
     private $is_deleted = false;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
+    private $last_registered_at;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $github_token;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\Unique
+     */
+    private $username;
 
     public function __construct() {
         $this->contexts = new ArrayCollection();
@@ -90,11 +108,50 @@ class User implements UserInterface{
         return $this;
     }
 
-    public function getRoles() {  }
+    public function getRoles() {  
+        return ['ROLE_USER'];
+    }
     public function eraseCredentials() {}
     public function getSalt() {}
-    public function getUserIdentifier() {}
-    public function getUsername() {}
+    public function getUserIdentifier() {
+        return $this->githubId;
+    }
+    public function getUsername() {
+        return $this->githubId;
+    }
     public function getPassword() {}
+
+    public function getLastRegisteredAt(): ?\DateTimeImmutable
+    {
+        return $this->last_registered_at;
+    }
+
+    public function setLastRegisteredAt(\DateTimeImmutable $last_registered_at): self
+    {
+        $this->last_registered_at = $last_registered_at;
+
+        return $this;
+    }
+
+    public function getGithubToken(): ?string
+    {
+        return $this->github_token;
+    }
+
+    public function setGithubToken(string $github_token): self
+    {
+        $this->github_token = $github_token;
+
+        return $this;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+   
 
 }

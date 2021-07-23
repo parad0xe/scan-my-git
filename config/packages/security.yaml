@@ -8,13 +8,13 @@ security:
             entity:
                 class: 'App\Entity\User'
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
         main:
             lazy: true
-            provider: users_in_memory
-            custom_authenticator: App\Security\AppAuthenticator
+            provider: users
+            entry_point: App\Security\AppAuthenticator
+            custom_authenticators:
+                - App\Security\AppAuthenticator
+                - App\Security\GithubAuthenticator 
             logout:
                 path: app_logout
                 # where to redirect after logout
