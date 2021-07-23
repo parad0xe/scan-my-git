@@ -2,10 +2,12 @@
 
 namespace App\Service;
 
+use LimitIterator;
 use App\Entity\Context;
 use App\Entity\Analysis;
 use Psr\Log\LoggerInterface;
 use App\Exception\GitException;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
@@ -56,7 +58,7 @@ class GitRepositoryManager {
         $process = new Process(['git', 'clone', $url, $path]);
         try {
             $process->setTimeout(60);
-            $process->setIdleTimeout(10);
+            // $process->setIdleTimeout(10);
 
             $process->mustRun();
         } catch (ProcessFailedException $e) {
@@ -68,7 +70,7 @@ class GitRepositoryManager {
             $this->delete($analysis);
             return false;
         }
-
+        $process->wait();
         //change rights
         // try {
         //     $filesystem->chmod($this->targetDirectory.$DirName, 0666, 0000, true);
@@ -106,30 +108,17 @@ class GitRepositoryManager {
     }
 
     public function support(Analysis $analysis, Proxy__ModuleEntity__ $proxy): bool {
+        $finder = new Finder();
         $path = $this->getPath($analysis);
 
         $reqs = $proxy->getRequirements();
-        foreach($reqs as $k=>$req){
-            $reqs[$k] = '-name '+$req;
-        };
-        $command = array_merge(['find', '.'], $reqs);
 
-        $process = new Process($command);
-        try {
-            $process->setTimeout(60);
-            $process->setIdleTimeout(10);
-
-            $process->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->logger->error($e->getMessage());
-            $this->delete($analysis);
-            return false;
-        } catch(ProcessTimedOutException $e){
-            $this->logger->error($e->getMessage());
-            $this->delete($analysis);
-            return false;
+        foreach($reqs as $req){
+            $finder->files()->name($req)->in($path);
+            if($finder->count()===0){
+                return false;
+            };
         }
-
         return true;
     }
 }

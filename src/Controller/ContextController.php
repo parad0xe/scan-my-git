@@ -133,6 +133,11 @@ class ContextController extends AbstractController {
             }
         }
 
+        if(empty($context->getContextModules())){
+            $this->logger->info($context->getGithubUrl()." doesn't support any module.");
+        }
+
+
         //create runners
         foreach ($context->getContextModules() as $context_module) {
             $runner = (new Runner())

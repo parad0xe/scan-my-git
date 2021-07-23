@@ -29,24 +29,33 @@ class RunnerController extends AbstractController {
             return new JsonResponse(['success'=> false, 'reason' => 'Forbidden']);
         };
         $cmd = $runner->getContextModule()->getCommand();
-        
-        $cmdArray = explode(' ', $cmd);
-        
-        $process = new Process($cmdArray);
+                
+        // $process = Process::fromShellCommandline('whoami');
+        // $process = Process::fromShellCommandline('echo $PATH');
+        // $process->run();
+        // dd($process->getOutput());
+        $process = Process::fromShellCommandline($cmd);
+        // $process = Process::fromShellCommandline($cmd." | sed 's/\x1b\[[0-9;]*m//g' ");
         try {
             $process->setWorkingDirectory($gitManager->getPath($analysis));
             $process->setTimeout(60);
             $process->setIdleTimeout(60);
+            // $process->setTty(true);
             
             $runner->setStartedAt(new \DateTimeImmutable());
             $process->mustRun();
+            
+            // $process->wait();
         } catch (ProcessFailedException $e) {
             $logger->error($e->getMessage());
+            // dd($e->getMessage());
             return new JsonResponse(['success'=> false, 'reason' => "Process failed {$e->getCode()}"]);
         } catch(ProcessTimedOutException $e){
             $logger->error($e->getMessage());
             return new JsonResponse(['success'=> false, 'reason' => 'Time out']);
+        } finally{
         }
+        // dd($process->);
 
         $runner->setFinishedAt(new \DateTimeImmutable());
         $runner->setOutput($process->getOutput());
@@ -54,7 +63,6 @@ class RunnerController extends AbstractController {
         $entityManager->persist($runner);
         $entityManager->flush();
 
-        $gitManager->delete($analysis);
 
 
         $logger->info("runner {$runner_id} finished.");
