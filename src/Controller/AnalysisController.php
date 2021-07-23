@@ -28,9 +28,11 @@ class AnalysisController extends AbstractController {
     }
     #[Route('/{analysis_hash}/result', name: 'analysis.result', methods: ['GET'])]
     public function result(AnalysisRepository $analysisRepository, string $analysis_hash): Response {
+        // $analysis = $analysisRepository->findOneBy(['hash' => $analysis_hash]);
         $analysis = $analysisRepository->findOneBy(['hash' => $analysis_hash]);
-
-        dd($analysis);
+        return $this->render('analysis/result.html.twig', [
+            'analysis'=>$analysis
+        ]);
         return new Response();
     }
 

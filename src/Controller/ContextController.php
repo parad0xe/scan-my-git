@@ -105,41 +105,42 @@ class ContextController extends AbstractController {
             ->setIsPrivate(false)
             ->setGithubUrl($github_url);
         $entityManager->persist($context);
-        $entityManager->flush();
-        
-        //clone repo
-        if(!$gitManager->clone($context)){
-            $this->addFlash("error", "erreur lors du téléchargement du repository");
-            $entityManager->remove($context);
-            $entityManager->flush();
-            return $this->redirectToRoute('home', []);
-        }
         
 
-        //create modulecontext
-        foreach (['php-security-checker', 'phpstan'] as $module_name) {
-            $module = $moduleManager->load(['name' => $module_name]);
-            if (!$module) {
-                continue;
-            }
-            
-            $moduleManager->attach($context, $module);
-        }
-        
         
         //create analysis
         $analysis = (new Analysis())
-            ->setContext($context);
-
-        $entityManager->persist($analysis);
-
+        ->setContext($context);
         
+        $entityManager->persist($analysis);
+        $entityManager->flush();
+
+        //clone repo
+        if(!$gitManager->clone($analysis)){
+            $this->addFlash("error", "erreur lors du téléchargement du repository");
+            $entityManager->remove($context);
+            $entityManager->remove($analysis);
+            $entityManager->flush();
+            return $this->redirectToRoute('home', []);
+        }
+
+        foreach (['php-security-checker', 'phpstan'] as $module_name) {
+            $module = $moduleManager->load(['name' => $module_name]);
+            if ($module) {
+                if($gitManager->support($analysis, $module)){
+                    $moduleManager->attach($context, $module);
+                }
+            }
+        }
+
         //create runners
         foreach ($context->getContextModules() as $context_module) {
             $runner = (new Runner())
             ->setAnalysis($analysis)
             ->setContextModule($context_module);
             $entityManager->persist($runner);
+
+            
             $analysis->addRunner($runner);
         }
         $entityManager->flush();

@@ -3,10 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Context;
+use App\Entity\Analysis;
 use Psr\Log\LoggerInterface;
 use App\Exception\GitException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
+use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -20,14 +22,15 @@ class GitRepositoryManager {
     ) {
     }
 
-    public function clone(Context $context): bool {
+    public function clone(Analysis $analysis): bool {
+        $context = $analysis->getContext();
         $filesystem = new Filesystem();
 
         //test if context is valid
         
         if(!$this->isValid($context)) return false;
 
-        $DirName = sha1($context->getGithubUrl().$context->getId());
+        $path = $this->getPath($analysis);
 
         $url = $context->getGithubUrl();
 
@@ -36,30 +39,33 @@ class GitRepositoryManager {
             $scheme = parse_url($url, PHP_URL_SCHEME);
             $path = parse_url($url, PHP_URL_PATH);
             $host = parse_url($url, PHP_URL_HOST);
-            $secret = $context->getSecretId();
-            $url = "$scheme://$secret@{$host}{$path}";
+            $token = $context->getSecretId();
+            // $token = $context->getUser()->getGithubToken();
+            $url = "$scheme://$token@{$host}{$path}";
         }
 
         //create directory
         try {
-            $filesystem->mkdir($this->targetDirectory.$DirName, 0666);
+            $filesystem->mkdir($path, 0666);
         } catch (IOException $e) {
             $this->logger->error($e->getMessage());
             return false;
         }
 
         //clone
-        $process = new Process(['git', 'clone', $url, $this->targetDirectory.$DirName]);
-        // $process = new Process(['git', 'clone', '--config', 'core.filemode=false', $url, $this->targetDirectory.$DirName]);
-        // $process = new Process(['git']);
+        $process = new Process(['git', 'clone', $url, $path]);
         try {
-            $process->setTimeout(30);
+            $process->setTimeout(60);
+            $process->setIdleTimeout(10);
+
             $process->mustRun();
         } catch (ProcessFailedException $e) {
             $this->logger->error($e->getMessage());
+            $this->delete($analysis);
             return false;
         } catch(ProcessTimedOutException $e){
             $this->logger->error($e->getMessage());
+            $this->delete($analysis);
             return false;
         }
 
@@ -73,13 +79,13 @@ class GitRepositoryManager {
         return true;
     }
 
-    public function delete(Context $context) {
+    public function delete(Analysis $analysis) {
         //remove from the folder
         $filesystem = new Filesystem();
-        $DirName = sha1($context->getGithubUrl().$context->getId());
+        $path = $this->getPath($analysis);
         
         try {
-            $filesystem->remove($this->targetDirectory.$DirName);
+            $filesystem->remove($path);
         } catch (IOException $e) {
             $this->logger->error($e->getMessage());
             return false;
@@ -94,8 +100,36 @@ class GitRepositoryManager {
         return true;
     }
 
-    public function getPath(Context $context) : string {
-        $DirName = sha1($context->getGithubUrl().$context->getId());
-        return $this->targetDirectory.$DirName;
+    public function getPath(Analysis $analysis): string {
+        $dirName = sha1($analysis->getId());
+        return $this->targetDirectory.$dirName;
+    }
+
+    public function support(Analysis $analysis, Proxy__ModuleEntity__ $proxy): bool {
+        $path = $this->getPath($analysis);
+
+        $reqs = $proxy->getRequirements();
+        foreach($reqs as $k=>$req){
+            $reqs[$k] = '-name '+$req;
+        };
+        $command = array_merge(['find', '.'], $reqs);
+
+        $process = new Process($command);
+        try {
+            $process->setTimeout(60);
+            $process->setIdleTimeout(10);
+
+            $process->mustRun();
+        } catch (ProcessFailedException $e) {
+            $this->logger->error($e->getMessage());
+            $this->delete($analysis);
+            return false;
+        } catch(ProcessTimedOutException $e){
+            $this->logger->error($e->getMessage());
+            $this->delete($analysis);
+            return false;
+        }
+
+        return true;
     }
 }

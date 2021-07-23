@@ -30,7 +30,7 @@
                     if(data.success){
                         console.log(data);
                     }else{
-                        console.log("t'as foiré");
+                        console.log(data);
                     }
                     resolve();
                 })
@@ -40,7 +40,7 @@
             });
         })
     })
-    Promise.all(promises).then(() => {console.log("finished")});
+    // Promise.all(promises).then(() => {window.location.replace("result")});
 
 </script>
 {% endblock %}
