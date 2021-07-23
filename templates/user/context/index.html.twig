@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User context{% endblock %}
+
+{% block body %}
+
+{% if is_granted('ROLE_USER') %}
+
+            Hello {{ user.username }}!
+           <a href="{{ path('app_logout') }}">Logout</a>
+
+            {% else %} 
+            <p>Erreur 404</p>
+        {% endif %}
+{% endblock %}

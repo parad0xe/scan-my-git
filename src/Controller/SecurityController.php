@@ -39,8 +39,8 @@ class SecurityController extends AbstractController
      * @Route("/connect/github/result", name="oauth_check")
      */
     public function check(ClientRegistry $clientRegistry) {
-        $client = $clientRegistry->getClient('github');
-       return $this->redirectToRoute('home');
+       $username = $this->getUser()->getUsername();
+       return $this->redirectToRoute('user_context', ['username' => $username]);
     }
 
     /**

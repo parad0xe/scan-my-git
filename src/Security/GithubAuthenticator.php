@@ -29,8 +29,6 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 class GithubAuthenticator extends AbstractAuthenticator
 {
 
-    use TargetPathTrait;
-
     private RouterInterface $router;
     private ClientRegistry $clientRegistry;
     private UserRepository $userRepository;

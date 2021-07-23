@@ -117,7 +117,7 @@ class User implements UserInterface{
         return $this->githubId;
     }
     public function getUsername() {
-        return $this->githubId;
+        return $this->username;
     }
     public function getPassword() {}
 
