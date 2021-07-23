@@ -1,6 +1,8 @@
 module:
     executable_name: php-security-checker
     alias: PHP Security Checker
+    requirements:
+        - composer.lock
     cli_parameters:
         value-separator: " "
 

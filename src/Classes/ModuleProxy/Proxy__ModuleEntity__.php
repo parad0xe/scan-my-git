@@ -15,6 +15,7 @@ class Proxy__ModuleEntity__ {
     private string $prefix;
     private string $executable_name;
     private string $alias;
+    private array $requirements;
     private CliParametersNode $cli_parameters;
     private FormBuilder $fb;
 
@@ -36,6 +37,7 @@ class Proxy__ModuleEntity__ {
         $this->prefix = $definition['prefix'] ?? '';
         $this->executable_name = $definition['executable_name'];
         $this->alias = $definition['alias'];
+        $this->requirements = $definition['requirements'] ?? [];
 
         $this->cli_parameters = new CliParametersNode(
             $this->prefix,
@@ -60,6 +62,10 @@ class Proxy__ModuleEntity__ {
 
     public function getAlias(): string {
         return $this->alias;
+    }
+
+    public function getRequirements(): array {
+        return $this->requirements;
     }
 
     public function getCliParameters(): CliParametersNode {
@@ -89,6 +95,10 @@ class Proxy__ModuleEntity__ {
                     ->scalarNode('prefix')->cannotBeEmpty()->end()
                     ->scalarNode('executable_name')->cannotBeEmpty()->isRequired()->end()
                     ->scalarNode('alias')->cannotBeEmpty()->isRequired()->end()
+                    ->arrayNode('requirements')
+                        ->requiresAtLeastOneElement()
+                        ->scalarPrototype()->end()
+                    ->end()
                     ->arrayNode('cli_parameters')
                         ->children()
                             ->scalarNode('value_separator')->isRequired()->cannotBeEmpty()->end()
