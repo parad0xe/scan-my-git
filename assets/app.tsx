@@ -2,11 +2,12 @@ import React from "react";
 import "./styles/app.css";
 import ReactDOM from "react-dom";
 import "react";
+import "./components/FormComponent";
 
 const App: React.FC = () => {
   return (
     <>
-      <p>Test</p>
+      <p className="text-3xl">Hello</p>
     </>
   );
 };
