@@ -39,18 +39,18 @@ RUN docker-php-ext-install pdo pdo_mysql
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \
     && php -r "unlink('composer-setup.php');" \
-    && mv composer.phar /usr/local/bin/composer
+    && mv composer.phar /usr/bin/composer
 
 # Symfony CLI
 RUN wget https://get.symfony.com/cli/installer -O - | bash \
-    && mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+    && mv /root/.symfony/bin/symfony /usr/bin/symfony
 
 # NodeJS / NPM
 RUN apk add --update nodejs npm
 
 RUN wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer \
     && chmod a+x php-cs-fixer \
-    && mv php-cs-fixer /usr/local/bin/php-cs-fixer
+    && mv php-cs-fixer /usr/bin/php-cs-fixer
 
 # Symfony PHP Conf
 COPY symfony.ini /etc/php8/conf.d/

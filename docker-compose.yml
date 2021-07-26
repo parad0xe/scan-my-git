@@ -36,7 +36,6 @@ services:
         volumes:
             - ./:/var/www/html
             - ./logs/nginx:/var/log/nginx
-        
 
     database:
         image: 'mariadb:latest'
