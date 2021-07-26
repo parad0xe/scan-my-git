@@ -151,7 +151,7 @@ class ContextController extends AbstractController {
         $entityManager->flush();
         
         //redirect
-        return $this->redirectToRoute('analysis.run', ['analysis_hash'=> $analysis->getHash()]);
+        return $this->redirectToRoute('analysis-pipeline.initialize', ['analysis_hash'=> $analysis->getHash()]);
     }
 
     #[Route('/{context_id}/delete', name: 'context.delete')]
