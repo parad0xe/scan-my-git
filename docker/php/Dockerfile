@@ -33,6 +33,8 @@ RUN apk --no-cache update \
 		php8-sodium \
 		php8-pecl-apcu
 
+RUN docker-php-ext-install pdo pdo_mysql
+
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \

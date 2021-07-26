@@ -2,45 +2,81 @@
 {% block title %}Analysis Running{% endblock %}
 
 {% block body %}
+    <h1>Runners</h1>
+
+    <div class="container">
+        <div>
+            Runners status: <span class="percent">0</span> <span>%</span>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
-<script defer>
-    const analysis_hash = '{{ analysis.hash }}';
-    const runners_id = JSON.parse('{{ runners_id | json_encode }}');
-    //route '/run/{analysis_hash}/{runner_id}'
-    console.log(analysis_hash);
-    console.log(runners_id);
+    <script defer type="text/javascript">
+        const process = function (url) {
+            const request = new Request(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'json'
+                },
+                mode: 'cors',
+                cache: 'default'
+            })
 
-    const promises = runners_id.map((runner_id) => {
-        const myInit = { method: 'POST',
-            headers: {
-                'Content-Type': 'json'
-            },
-            mode: 'cors',
-            cache: 'default' 
-        };
-
-        const request = new Request(`/runner/run/${analysis_hash}/${runner_id}`, myInit);
-
-        return new Promise((resolve) => {
-            fetch(request)
-            .then((response) => {
-                response.json().then((data) => {
-                    if(data.success){
-                        console.log(data);
-                    }else{
-                        console.log(data);
+            return new Promise((resolve, reject) => {
+                fetch(request).then((response) => {
+                    if (!response.ok) {
+                        return reject()
                     }
-                    resolve();
+
+                    console.log(response)
+
+                    response.json().then((data) => {
+                        console.log(data)
+                        if (data.success === false) {
+                            return reject()
+                        }
+
+                        resolve()
+                    })
+                }).catch(() => {
+                    return reject(false)
                 })
             })
-            .catch((error) => {
-                console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
-            });
-        })
-    })
-    // Promise.all(promises).then(() => {window.location.replace("result")});
+        }
 
-</script>
+        const analysis_hash = '{{ analysis.hash }}'
+        const runners_id = JSON.parse('{{ runners_id | json_encode }}')
+        const uri_base = `/analysis/${analysis_hash}`
+        let percent = 0
+
+        console.log(analysis_hash)
+        console.log(runners_id)
+
+        // Initialize downloaded project
+        console.log('INITIALIZE')
+        process(`/analysis/${analysis_hash}/initialize`).then(() => {
+            // Start runners
+            const promises = runners_id.map((runner_id) => {
+                console.log(`START.. ${runner_id}`)
+                return process(`/analysis/${analysis_hash}/run/${runner_id}`).then(() => {
+                    console.log(`END.. ${runner_id}`)
+                }).then(() => {
+                    document.querySelector(".percent").textContent = ((++percent * 100) / runners_id.length).toString()
+                })
+            })
+
+            // Clean downloaded project
+            Promise.all(promises).then(async () => {
+                console.log(`FINISHED.. cleaning`)
+                await process(`/analysis/${analysis_hash}/clean`)
+                console.log(`FINISHED.. ok`)
+                // window.location.replace("result")
+            })
+        }).catch(() => {
+            console.error(`ERROR.. cleaning`)
+            // Clean downloaded project
+            process(`/analysis/${analysis_hash}/clean`)
+        })
+    </script>
 {% endblock %}

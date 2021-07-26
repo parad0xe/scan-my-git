@@ -15,7 +15,7 @@ class AnalysisController extends AbstractController {
         return new Response();
     }
 
-    #[Route('/{analysis_hash}/run', name: 'analysis.run', methods: ['GET'])]
+    #[Route('/{analysis_hash}/start', name: 'analysis.run', methods: ['GET'])]
     public function run(AnalysisRepository $analysisRepository, string $analysis_hash): Response {
         $analysis = $analysisRepository->findOneBy(['hash' => $analysis_hash]);
         $runners = $analysis->getRunners();
