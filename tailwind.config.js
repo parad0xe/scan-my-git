@@ -16,7 +16,8 @@ module.exports = {
     colors: {
       transparent: "transparent",
       current: "currentColor",
-
+      navColor: "#019FC1",
+      blueWallpaper: "#00ADD3",
       black: colors.black,
       white: colors.white,
       gray: colors.coolGray,
