@@ -1,18 +1,19 @@
 import * as React from "react";
 
-const Button: React.FC<{
+interface ButtonPropsInterface {
   name: string;
   classes: string;
   isVerified: boolean;
-  isSubmitting: boolean;
-}> = ({ name, classes, isVerified, isSubmitting }) => {
+}
+
+const Button: React.FC<ButtonPropsInterface> = ({
+  name,
+  classes,
+  isVerified,
+}) => {
   return (
     <>
-      <button
-        type="submit"
-        className={classes}
-        disabled={!isVerified && isSubmitting}
-      >
+      <button type="submit" className={classes} disabled={!isVerified}>
         {name}
       </button>
     </>
