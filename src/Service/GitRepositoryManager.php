@@ -2,22 +2,22 @@
 
 namespace App\Service;
 
-use LimitIterator;
-use App\Entity\Context;
-use App\Entity\Analysis;
-use Psr\Log\LoggerInterface;
-use App\Exception\GitException;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Filesystem\Filesystem;
 use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
+use App\Classes\Utils;
+use App\Entity\Analysis;
+use App\Entity\Context;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 
 class GitRepositoryManager {
-    private $targetDirectory = '/var/www/html/downloads/github/';
-    private $validHosts = ['github.com'];
+
+    private string $targetDirectory = '/var/www/html/downloads/github/';
+    private array $validHosts = ['github.com'];
 
     public function __construct(
         private LoggerInterface $logger
@@ -29,8 +29,8 @@ class GitRepositoryManager {
         $filesystem = new Filesystem();
 
         //test if context is valid
-        
-        if(!$this->isValid($context)) return false;
+
+        if (!$this->isValid($context)) return false;
 
         $path = $this->getPath($analysis);
 
@@ -61,16 +61,12 @@ class GitRepositoryManager {
             // $process->setIdleTimeout(10);
 
             $process->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->logger->error($e->getMessage());
-            $this->delete($analysis);
-            return false;
-        } catch(ProcessTimedOutException $e){
+        } catch (ProcessFailedException | ProcessTimedOutException $e) {
             $this->logger->error($e->getMessage());
             $this->delete($analysis);
             return false;
         }
-        $process->wait();
+
         //change rights
         // try {
         //     $filesystem->chmod($this->targetDirectory.$DirName, 0666, 0000, true);
@@ -81,20 +77,21 @@ class GitRepositoryManager {
         return true;
     }
 
-    public function delete(Analysis $analysis) {
+    public function delete(Analysis $analysis): bool {
         //remove from the folder
-        $filesystem = new Filesystem();
         $path = $this->getPath($analysis);
-        
-        try {
-            $filesystem->remove($path);
-        } catch (IOException $e) {
-            $this->logger->error($e->getMessage());
-            return false;
-        }
+
+        Utils::rrmdir($path);
+
+        return true;
     }
 
-    public function isValid(Context $context) {
+    public function exist(Analysis $analysis): bool {
+        $path = $this->getPath($analysis);
+        return (new Filesystem())->exists($path);
+    }
+
+    public function isValid(Context $context): bool {
         if (!in_array(parse_url($context->getGithubUrl(), PHP_URL_HOST), $this->validHosts)) {
             return false;
         }
@@ -104,7 +101,7 @@ class GitRepositoryManager {
 
     public function getPath(Analysis $analysis): string {
         $dirName = sha1($analysis->getId());
-        return $this->targetDirectory.$dirName;
+        return $this->targetDirectory . $dirName;
     }
 
     public function support(Analysis $analysis, Proxy__ModuleEntity__ $proxy): bool {
@@ -113,11 +110,11 @@ class GitRepositoryManager {
 
         $reqs = $proxy->getRequirements();
 
-        foreach($reqs as $req){
+        foreach ($reqs as $req) {
             $finder->files()->name($req)->in($path);
-            if($finder->count()===0){
+            if ($finder->count() === 0) {
                 return false;
-            };
+            }
         }
         return true;
     }

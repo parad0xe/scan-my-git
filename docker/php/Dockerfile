@@ -6,6 +6,8 @@ RUN apk --no-cache update \
     	bash \
     	git \
 		shadow \
+		libzip-dev \
+		zip \
     	php8-fpm \
 		php8-ctype \
 		php8-curl \
@@ -33,7 +35,7 @@ RUN apk --no-cache update \
 		php8-sodium \
 		php8-pecl-apcu
 
-RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql zip
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \

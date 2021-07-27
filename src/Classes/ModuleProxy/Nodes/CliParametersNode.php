@@ -6,15 +6,16 @@ use App\Classes\ModuleProxy\Nodes\Parameter\ParameterNode;
 use App\Exception\IllegalArgumentException;
 
 class CliParametersNode {
+    private string $module_path;
     private string $prefix;
     private string $executable;
 
     private string $value_separator;
-
     /** @var ParameterNode[] */
     private array $parameters;
 
-    public function __construct(string $prefix, string $executable, array $parameters) {
+    public function __construct(string $module_path, string $prefix, string $executable, array $parameters) {
+        $this->module_path = $module_path;
         $this->prefix = $prefix;
         $this->executable = $executable;
 
@@ -59,15 +60,22 @@ class CliParametersNode {
     public function generateCommand(): string {
         $command = "$this->prefix $this->executable";
 
-        $command .= ' '.implode(' ', array_map(function (ParameterNode $parameterNode): string {
-            if (is_null($parameterNode->getValue()) || false === $parameterNode->getValue()) {
-                return $parameterNode->getName();
-            }
-            if (is_null($parameterNode->getName()) || false === $parameterNode->getName()) {
-                return $parameterNode->getValue();
+        $command .= ' '.implode(' ', array_map(/** * @throws IllegalArgumentException */ function (ParameterNode $parameterNode): string {
+            preg_match("/^\\$\\{path:(.+)}$/", $parameterNode->getValue(), $matches);
+
+            if(count($matches) > 0) {
+                $parameterNode->setValue("{$this->module_path}/resource/$matches[1]");
             }
 
-            return implode($this->getValueSeparator(), [$parameterNode->getName(), $parameterNode->getValue()]);
+            if (is_null($parameterNode->getValue()) || false === $parameterNode->getValue()) {
+                return escapeshellarg(trim($parameterNode->getName(), ' '));
+            }
+
+            if (is_null($parameterNode->getName()) || false === $parameterNode->getName()) {
+                return escapeshellarg(trim($parameterNode->getValue(), ' '));
+            }
+
+            return trim(implode($this->getValueSeparator(), [$parameterNode->getName(), $parameterNode->getValue()]), ' ');
         }, $this->parameters));
 
         return escapeshellcmd(trim($command, ' '));

@@ -31,5 +31,5 @@ module:
                 input:
                     type: text
                     attributes: { maxlength: 50 }
-                default: src
+                default: 'src tests .'
                 required: true

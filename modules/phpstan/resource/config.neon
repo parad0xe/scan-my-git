@@ -1,0 +1,4 @@
+parameters:
+	excludePaths:
+		- node_modules/
+		- vendor/
