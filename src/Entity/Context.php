@@ -54,9 +54,15 @@ class Context {
      */
     private $created_at;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ContextModule::class, mappedBy="context", orphanRemoval=true)
+     */
+    private $contextModules;
+
     public function __construct() {
         $this->analyses = new ArrayCollection();
         $this->created_at = new \DateTimeImmutable();
+        $this->contextModules = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -144,6 +150,36 @@ class Context {
             // set the owning side to null (unless already changed)
             if ($analysis->getContext() === $this) {
                 $analysis->setContext(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ContextModule[]
+     */
+    public function getContextModules(): Collection
+    {
+        return $this->contextModules;
+    }
+
+    public function addContextModule(ContextModule $contextModule): self
+    {
+        if (!$this->contextModules->contains($contextModule)) {
+            $this->contextModules[] = $contextModule;
+            $contextModule->setContext($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContextModule(ContextModule $contextModule): self
+    {
+        if ($this->contextModules->removeElement($contextModule)) {
+            // set the owning side to null (unless already changed)
+            if ($contextModule->getContext() === $this) {
+                $contextModule->setContext(null);
             }
         }
 

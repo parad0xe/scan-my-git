@@ -19,17 +19,17 @@ class Analysis {
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $score;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime_immutable", nullable=true)
      */
     private $started_at;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime_immutable", nullable=true)
      */
     private $finished_at;
 
@@ -44,8 +44,14 @@ class Analysis {
      */
     private $runners;
 
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $hash;
+
     public function __construct() {
         $this->runners = new ArrayCollection();
+        $this->hash = hash("sha256", uniqid('', true));
     }
 
     public function getId(): ?int {
@@ -115,6 +121,18 @@ class Analysis {
                 $runner->setAnalysis(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(string $hash): self
+    {
+        $this->hash = $hash;
 
         return $this;
     }

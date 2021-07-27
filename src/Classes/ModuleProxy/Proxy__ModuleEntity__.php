@@ -12,9 +12,11 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
 class Proxy__ModuleEntity__ {
+
     private string $prefix;
     private string $executable_name;
     private string $alias;
+    private array $requirements;
     private CliParametersNode $cli_parameters;
     private FormBuilder $fb;
 
@@ -33,11 +35,19 @@ class Proxy__ModuleEntity__ {
             Yaml::parseFile($module->getDefinitionFile())
         );
 
-        $this->prefix = $definition['prefix'] ?? '';
+        if (!empty($definition['prefix'])) {
+            $this->prefix = $definition['prefix'];
+        } else {
+            $this->prefix = '';
+        }
+
+        // $this->prefix = $definition['prefix'] ?? '';
         $this->executable_name = $definition['executable_name'];
         $this->alias = $definition['alias'];
+        $this->requirements = $definition['requirements'] ?? [];
 
         $this->cli_parameters = new CliParametersNode(
+            $module->getPath(),
             $this->prefix,
             "{$this->module->getPath()}/$this->executable_name",
             $definition['cli_parameters']
@@ -60,6 +70,10 @@ class Proxy__ModuleEntity__ {
 
     public function getAlias(): string {
         return $this->alias;
+    }
+
+    public function getRequirements(): array {
+        return $this->requirements;
     }
 
     public function getCliParameters(): CliParametersNode {
@@ -89,6 +103,10 @@ class Proxy__ModuleEntity__ {
                     ->scalarNode('prefix')->cannotBeEmpty()->end()
                     ->scalarNode('executable_name')->cannotBeEmpty()->isRequired()->end()
                     ->scalarNode('alias')->cannotBeEmpty()->isRequired()->end()
+                    ->arrayNode('requirements')
+                        ->requiresAtLeastOneElement()
+                        ->scalarPrototype()->end()
+                    ->end()
                     ->arrayNode('cli_parameters')
                         ->children()
                             ->scalarNode('value_separator')->isRequired()->cannotBeEmpty()->end()

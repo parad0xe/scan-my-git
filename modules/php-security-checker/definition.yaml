@@ -1,6 +1,8 @@
 module:
     executable_name: php-security-checker
     alias: PHP Security Checker
+    requirements:
+        - composer.lock
     cli_parameters:
         value-separator: " "
 
@@ -11,5 +13,5 @@ module:
                 input:
                     type: text
                     attributes: { maxlength: 50 }
-                default: src
+                default: .
                 required: true

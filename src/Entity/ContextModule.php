@@ -33,10 +33,11 @@ class ContextModule {
     private $parameters = [];
 
     /**
-     * @ORM\ManyToOne(targetEntity=Context::class)
+     * @ORM\ManyToOne(targetEntity=Context::class, inversedBy="contextModules")
      * @ORM\JoinColumn(nullable=false)
      */
     private $context;
+
 
     public function __construct() {
     }
@@ -75,13 +76,16 @@ class ContextModule {
         return $this;
     }
 
-    public function getContext(): ?Context {
+    public function getContext(): ?Context
+    {
         return $this->context;
     }
 
-    public function setContext(?Context $context): self {
+    public function setContext(?Context $context): self
+    {
         $this->context = $context;
 
         return $this;
     }
+
 }

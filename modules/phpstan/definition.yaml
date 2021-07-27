@@ -1,5 +1,4 @@
 module:
-    prefix: php
     executable_name: phpstan.phar
     alias: PHPStan
     cli_parameters:
@@ -21,15 +20,9 @@ module:
                 default: 2
                 required: true
 
-            -   identifier: 78517de5370ec92f4b4900b12c95fc3da5a5cdbe
-                label: Log
-                name: --log
-                input:
-                    type: select
-                    select_configuration:
-                        options: [ none, info, warning, error, all ]
-                        selected: warning
-                default: warning
+            -   identifier: 04264DA2B7594C2AE326748260EBD51BD643C0AD
+                label: Debug
+                name: --debug
                 required: true
 
             -   identifier: 6e3a5b7ce64d1fc4fcd2ebe2580ab3daa37675ab
@@ -38,5 +31,5 @@ module:
                 input:
                     type: text
                     attributes: { maxlength: 50 }
-                default: src
+                default: 'src tests .'
                 required: true
