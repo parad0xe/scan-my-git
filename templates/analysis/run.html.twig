@@ -8,7 +8,7 @@
         <div>
             Runners status: <span class="percent">0</span> <span>%</span>
         </div>
-
+        <LoadingCircle name="" />
         <div class="status"></div>
 
         <div style="margin-top: 40px">
@@ -95,7 +95,7 @@
                     console.log(`FINISHED.. cleaning`)
                     await process(`/analysis/${analysis_hash}/clean`)
                     console.log(`FINISHED.. ok`)
-                    window.location.replace("result")
+                    // window.location.replace("result")
                 })
             }).catch(() => {
                 console.error(`ERROR.. cleaning`)
