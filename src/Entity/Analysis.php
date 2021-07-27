@@ -45,13 +45,13 @@ class Analysis {
     private $runners;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="text")
      */
     private $hash;
 
     public function __construct() {
         $this->runners = new ArrayCollection();
-        $this->hash = uniqid('', true);
+        $this->hash = hash("sha256", uniqid('', true));
     }
 
     public function getId(): ?int {

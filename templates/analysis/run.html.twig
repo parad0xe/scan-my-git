@@ -8,6 +8,13 @@
         <div>
             Runners status: <span class="percent">0</span> <span>%</span>
         </div>
+
+        <div class="status"></div>
+
+        <div style="margin-top: 40px">
+            <h2>Logs</h2>
+            <pre class="logs" style="word-wrap: break-word; overflow: auto; height: 60vh;"></pre>
+        </div>
     </div>
 {% endblock %}
 
@@ -29,8 +36,6 @@
                         return reject()
                     }
 
-                    console.log(response)
-
                     response.json().then((data) => {
                         console.log(data)
                         if (data.success === false) {
@@ -45,38 +50,58 @@
             })
         }
 
-        const analysis_hash = '{{ analysis.hash }}'
-        const runners_id = JSON.parse('{{ runners_id | json_encode }}')
-        const uri_base = `/analysis/${analysis_hash}`
-        let percent = 0
+        const handle_log = function(topic) {
+            const url = new URL('http://localhost:9090/.well-known/mercure');
+            url.searchParams.append('topic', topic);
 
-        console.log(analysis_hash)
-        console.log(runners_id)
+            const eventSource = new EventSource(url);
+            eventSource.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                document.querySelector('.logs').innerHTML += `<div style="white-space: pre-wrap;">${data.log}</div>`
+                document.querySelector('.logs').scrollTop = document.querySelector('.logs').scrollHeight;
+            };
+        }
 
-        // Initialize downloaded project
-        console.log('INITIALIZE')
-        process(`/analysis/${analysis_hash}/initialize`).then(() => {
-            // Start runners
-            const promises = runners_id.map((runner_id) => {
-                console.log(`START.. ${runner_id}`)
-                return process(`/analysis/${analysis_hash}/run/${runner_id}`).then(() => {
-                    console.log(`END.. ${runner_id}`)
-                }).then(() => {
-                    document.querySelector(".percent").textContent = ((++percent * 100) / runners_id.length).toString()
+        window.addEventListener('DOMContentLoaded', () => {
+            const analysis_hash = '{{ analysis.hash }}'
+            const runners_id = JSON.parse('{{ runners_id | json_encode }}')
+            let percent = 0
+
+            console.log(analysis_hash)
+            console.log(runners_id)
+
+            handle_log(`${analysis_hash}/logs`)
+
+            // Initialize downloaded project
+            console.log('INITIALIZE')
+            document.querySelector(".status").textContent = "Initializing.."
+            process(`/analysis/${analysis_hash}/initialize`).then(() => {
+                // Start runners
+                document.querySelector(".status").textContent = ""
+                const promises = runners_id.map((runner_id) => {
+                    document.querySelector(".status").innerHTML += `<div runner-id='${runner_id}'>Runner ${runner_id} status: <span class="runner-status">Analysis..</span></div>`
+                    console.log(`START.. ${runner_id}`)
+                    return process(`/analysis/${analysis_hash}/run/${runner_id}`).then(() => {
+                        console.log(`END.. ${runner_id}`)
+                    }).then(() => {
+                        document.querySelector(`[runner-id='${runner_id}'] .runner-status`).textContent = `Finish`
+                        document.querySelector(".percent").textContent = ((++percent * 100) / runners_id.length).toString()
+                    })
                 })
-            })
 
-            // Clean downloaded project
-            Promise.all(promises).then(async () => {
-                console.log(`FINISHED.. cleaning`)
-                await process(`/analysis/${analysis_hash}/clean`)
-                console.log(`FINISHED.. ok`)
-                // window.location.replace("result")
+                // Clean downloaded project
+                Promise.all(promises).then(async () => {
+                    document.querySelector(".status").innerHTML += "<div>Cleaning..</div>"
+                    console.log(`FINISHED.. cleaning`)
+                    await process(`/analysis/${analysis_hash}/clean`)
+                    console.log(`FINISHED.. ok`)
+                    window.location.replace("result")
+                })
+            }).catch(() => {
+                console.error(`ERROR.. cleaning`)
+                // Clean downloaded project
+                process(`/analysis/${analysis_hash}/clean`)
             })
-        }).catch(() => {
-            console.error(`ERROR.. cleaning`)
-            // Clean downloaded project
-            process(`/analysis/${analysis_hash}/clean`)
         })
     </script>
 {% endblock %}

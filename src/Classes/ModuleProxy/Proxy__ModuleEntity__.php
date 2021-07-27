@@ -2,17 +2,17 @@
 
 namespace App\Classes\ModuleProxy;
 
+use App\Classes\ModuleProxy\Nodes\CliParametersNode;
 use App\Entity\Module;
-use Symfony\Component\Yaml\Yaml;
 use App\Exception\FileNotFoundException;
 use App\Exception\MethodNotFoundException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Config\Definition\Processor;
-use App\Classes\ModuleProxy\Nodes\CliParametersNode;
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Yaml\Yaml;
 
 class Proxy__ModuleEntity__ {
+
     private string $prefix;
     private string $executable_name;
     private string $alias;
@@ -35,12 +35,9 @@ class Proxy__ModuleEntity__ {
             Yaml::parseFile($module->getDefinitionFile())
         );
 
-        if(!empty($definition['prefix'])){
-            // dd($definition['prefix']);
-            $executableFinder = new ExecutableFinder();
-            // dd($definition, $executableFinder->find($definition['prefix'], null, ['/usr/local/bin']));
-            $this->prefix = $executableFinder->find($definition['prefix'], null, ['/usr/local/bin']);
-        }else{
+        if (!empty($definition['prefix'])) {
+            $this->prefix = $definition['prefix'];
+        } else {
             $this->prefix = '';
         }
 
@@ -50,6 +47,7 @@ class Proxy__ModuleEntity__ {
         $this->requirements = $definition['requirements'] ?? [];
 
         $this->cli_parameters = new CliParametersNode(
+            $module->getPath(),
             $this->prefix,
             "{$this->module->getPath()}/$this->executable_name",
             $definition['cli_parameters']

@@ -2,23 +2,24 @@
 
 namespace App\Controller;
 
-use App\Entity\Runner;
-use App\Entity\Context;
+use App\Classes\Errors\ErrorCode;
 use App\Entity\Analysis;
+use App\Entity\Context;
+use App\Entity\Runner;
 use App\Exception\IllegalArgumentException;
 use App\Repository\ContextRepository;
-use App\Service\ModuleManager;
 use App\Service\GitRepositoryManager;
+use App\Service\ModuleManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/context')]
 class ContextController extends AbstractController {
+
     public function __construct(
         private LoggerInterface $logger
     ) {
@@ -29,8 +30,7 @@ class ContextController extends AbstractController {
         $context = $contextRepository->find($context_id);
 
         if (!$context) {
-            $this->addFlash('error', 'Aucun contexte associé');
-
+            $this->addFlash('error', ErrorCode::ERROR_FORBIDDEN);
             return $this->redirectToRoute('home');
         }
 
@@ -42,23 +42,15 @@ class ContextController extends AbstractController {
         ]);
     }
 
-    #[Route('/create', name: 'context.create', methods: ['GET'])]
-    public function create(EntityManagerInterface $entityManager): Response {
-        $context = (new Context())
-            ->setName('My Custom Context')
-            ->setGithubUrl('https://github.com')
-            ->setIsPrivate(false);
-
-        $entityManager->persist($context);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
-    }
-
     #[Route('/{context_id}/module/attach/{module_id}', name: 'context.module.attach', methods: ['POST'])]
     public function attach(Request $request, ModuleManager $moduleManager, ContextRepository $contextRepository, int $context_id, int $module_id): Response {
         $context = $contextRepository->find($context_id);
         $module = $moduleManager->load($module_id);
+
+        if (!$context || !$module) {
+            $this->addFlash('error', ErrorCode::ERROR_FORBIDDEN);
+            return $this->redirectToRoute('home');
+        }
 
         $data = $request->request->get('module')[$module_id];
 
@@ -66,7 +58,7 @@ class ContextController extends AbstractController {
             $module->getCliParameters()->bind($data);
         } catch (IllegalArgumentException $e) {
             $this->logger->error($e->getMessage());
-            $this->addFlash('error', 'Argument invalide');
+            $this->addFlash('error', ErrorCode::ERROR_INVALID_ARGUMENTS);
 
             return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
         }
@@ -74,7 +66,6 @@ class ContextController extends AbstractController {
         $moduleManager->attach($context, $module);
 
         return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
-//        return new JsonResponse(["success" => true]);
     }
 
     #[Route('/{context_id}/module/detach/{module_id}', name: 'context.module.detach', methods: ['GET'])]
@@ -86,7 +77,6 @@ class ContextController extends AbstractController {
         $moduleManager->detach($context, $module);
 
         return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
-//        return new JsonResponse(["success" => true]);
     }
 
     #[Route('/quick-analysis', name: 'context.quick-analysis', methods: ['POST'])]
@@ -94,72 +84,81 @@ class ContextController extends AbstractController {
         $github_url = $request->get('github_url');
 
         if (null === $github_url || empty($github_url)) {
-            $this->addFlash('error', 'Invalid URL');
-
+            $this->addFlash('error', ErrorCode::ERROR_GIT_URL);
             return $this->redirectToRoute('home', []);
         }
 
-        //create context
+        //region -- create context
         $context = (new Context())
             ->setName(sha1(uniqid()))
             ->setIsPrivate(false)
             ->setGithubUrl($github_url);
         $entityManager->persist($context);
-        
+        //endregion -- create context
 
-        
-        //create analysis
+
+        //region -- create analysis
         $analysis = (new Analysis())
-        ->setContext($context);
-        
+            ->setContext($context);
         $entityManager->persist($analysis);
+        //endregion -- create analysis
+
         $entityManager->flush();
 
-        //clone repo
-        if(!$gitManager->clone($analysis)){
-            $this->addFlash("error", "erreur lors du téléchargement du repository");
+        //region -- clone repository
+        if (!$gitManager->clone($analysis)) {
+            $this->addFlash("error", ErrorCode::ERROR_GIT_DOWNLOAD_FAILED);
             $entityManager->remove($context);
             $entityManager->remove($analysis);
             $entityManager->flush();
+
             return $this->redirectToRoute('home', []);
         }
+        //endregion -- clone repository
 
+        //region -- add modules
         foreach (['php-security-checker', 'phpstan'] as $module_name) {
             $module = $moduleManager->load(['name' => $module_name]);
             if ($module) {
-                if($gitManager->support($analysis, $module)){
+                if ($gitManager->support($analysis, $module)) {
                     $moduleManager->attach($context, $module);
                 }
             }
         }
+        //endregion -- add modules
 
-        if(empty($context->getContextModules())){
-            $this->logger->info($context->getGithubUrl()." doesn't support any module.");
+        if (empty($context->getContextModules())) {
+            $this->logger->info($context->getGithubUrl() . " doesn't support any module.");
         }
 
 
-        //create runners
+        //region -- create runners
         foreach ($context->getContextModules() as $context_module) {
             $runner = (new Runner())
-            ->setAnalysis($analysis)
-            ->setContextModule($context_module);
+                ->setAnalysis($analysis)
+                ->setContextModule($context_module);
             $entityManager->persist($runner);
 
-            
             $analysis->addRunner($runner);
         }
+        //endregion -- create runners
+
         $entityManager->flush();
-        
-        //redirect
-        return $this->redirectToRoute('analysis-pipeline.initialize', ['analysis_hash'=> $analysis->getHash()]);
+
+        return $this->redirectToRoute('analysis.run', ['analysis_hash' => $analysis->getHash()]);
     }
 
-    #[Route('/{context_id}/delete', name: 'context.delete')]
-    public function delete(EntityManagerInterface $entityManager, ContextRepository $contextRepository, int $context_id): JsonResponse {
-        $context = $contextRepository->find($context_id);
-        if(!$context) return new JsonResponse(['response' => 'context doesnt exist']);
-        $entityManager->remove($context);
-        $entityManager->flush();
-        return new JsonResponse(['response' => 'context removed']);
-    }
+//    #[Route('/{context_id}/delete', name: 'context.delete')]
+//    public function delete(EntityManagerInterface $entityManager, ContextRepository $contextRepository, int $context_id): JsonResponse {
+//        $context = $contextRepository->find($context_id);
+//
+//        if (!$context) {
+//            return new JsonResponse(['response' => ErrorCode::ERROR_FORBIDDEN]);
+//        }
+//
+//        $entityManager->remove($context);
+//        $entityManager->flush();
+//
+//        return new JsonResponse(['response' => 'context removed']);
+//    }
 }

@@ -8,7 +8,10 @@
 
     <div>
         {% for runner in analysis.runners %}
-            <li>{{ runner.id }} : {{ runner.output }}</li>
+            <li>
+                <span>{{ runner.id }} :</span>
+                <pre>{{ runner.output }}</pre>
+            </li>
         {% endfor %}
     </div>
 {% endblock %}
