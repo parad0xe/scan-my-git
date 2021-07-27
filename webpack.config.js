@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Encore = require("@symfony/webpack-encore");
-
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
 if (!Encore.isRuntimeEnvironmentConfigured()) {
@@ -61,6 +60,7 @@ Encore
 
   // enables Sass/SCSS support
   .enableSassLoader()
+  .enablePostCssLoader()
 
   // uncomment if you use TypeScript
   //.enableTypeScriptLoader()
