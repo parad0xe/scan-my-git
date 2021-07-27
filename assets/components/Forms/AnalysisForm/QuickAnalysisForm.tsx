@@ -4,6 +4,7 @@ import Button from "../Button";
 import Title from "../../Widgets/Title";
 import { Formik, Field, Form } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 
 interface MyFormValues {
   githubUrl: string;
@@ -20,6 +21,7 @@ const validationSchema = yup.object().shape({
 });
 
 const QuickAnalysisForm: React.FC = () => {
+  const initialValues: MyFormValues = { githubUrl: "" };
   const [isVerified, setIsVerified] = useState(false);
   const verifyCallback = () => {
     setIsVerified(!isVerified);
@@ -34,18 +36,21 @@ const QuickAnalysisForm: React.FC = () => {
           <Title name="Analyse Rapide" />
         </div>
         <Formik
-          initialValues={{ githubUrl: "" }}
+          initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={(values, { setSubmitting, resetForm }) => {
-            setTimeout(() => {
-              console.log({ values });
+            setTimeout(async () => {
+              const { githubUrl } = values;
+              console.log(githubUrl);
+              await axios.post("/context/quick-analysis", {
+                githubUrl,
+              });
               resetForm();
               setSubmitting(false);
             }, 1000);
           }}
         >
           {({
-            values,
             errors,
             touched,
             handleChange,
@@ -77,15 +82,14 @@ const QuickAnalysisForm: React.FC = () => {
                   name="Analyse rapide"
                   classes="justify-center py-2 px-4 border text-white w-full"
                   isVerified={isVerified}
+                  isSubmitting={isSubmitting}
                 />
               </div>
             </Form>
           )}
         </Formik>
         <Recaptcha
-          sitekey="6Le7IL8bAAAAAELg75XwkJTOLJww822VXPx6GPky
-
-        "
+          sitekey="6Le7IL8bAAAAAELg75XwkJTOLJww822VXPx6GPky"
           render="explicit"
           verifyCallback={verifyCallback}
           onloadCallback={callback}

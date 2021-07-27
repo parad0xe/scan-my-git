@@ -5,6 +5,7 @@ import { Route, Switch, BrowserRouter } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import QuickAnalysisForm from "./components/Forms/AnalysisForm/QuickAnalysisForm";
 import Navbar from "./components/Nav/Navbar";
+import AnalysisPage from "./components/AnalysisPage";
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <BrowserRouter>
           <Switch>
             <Route path="/" component={QuickAnalysisForm} />
+            <Route path="/analysis" component={AnalysisPage} />
           </Switch>
         </BrowserRouter>
       </Layout>
