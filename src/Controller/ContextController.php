@@ -2,16 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Runner;
 use App\Entity\Context;
+use App\Entity\Analysis;
 use App\Exception\IllegalArgumentException;
 use App\Repository\ContextRepository;
 use App\Service\ModuleManager;
+use App\Service\GitRepositoryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/context')]
 class ContextController extends AbstractController {
@@ -83,5 +87,79 @@ class ContextController extends AbstractController {
 
         return $this->redirectToRoute('context.index', ['context_id' => $context->getId()]);
 //        return new JsonResponse(["success" => true]);
+    }
+
+    #[Route('/quick-analysis', name: 'context.quick-analysis', methods: ['POST'])]
+    public function quickAnalysis(Request $request, ModuleManager $moduleManager, EntityManagerInterface $entityManager, GitRepositoryManager $gitManager): Response {
+        $github_url = $request->get('github_url');
+
+        if (null === $github_url || empty($github_url)) {
+            $this->addFlash('error', 'Invalid URL');
+
+            return $this->redirectToRoute('home', []);
+        }
+
+        //create context
+        $context = (new Context())
+            ->setName(sha1(uniqid()))
+            ->setIsPrivate(false)
+            ->setGithubUrl($github_url);
+        $entityManager->persist($context);
+        
+
+        
+        //create analysis
+        $analysis = (new Analysis())
+        ->setContext($context);
+        
+        $entityManager->persist($analysis);
+        $entityManager->flush();
+
+        //clone repo
+        if(!$gitManager->clone($analysis)){
+            $this->addFlash("error", "erreur lors du téléchargement du repository");
+            $entityManager->remove($context);
+            $entityManager->remove($analysis);
+            $entityManager->flush();
+            return $this->redirectToRoute('home', []);
+        }
+
+        foreach (['php-security-checker', 'phpstan'] as $module_name) {
+            $module = $moduleManager->load(['name' => $module_name]);
+            if ($module) {
+                if($gitManager->support($analysis, $module)){
+                    $moduleManager->attach($context, $module);
+                }
+            }
+        }
+
+        if(empty($context->getContextModules())){
+            $this->logger->info($context->getGithubUrl()." doesn't support any module.");
+        }
+
+
+        //create runners
+        foreach ($context->getContextModules() as $context_module) {
+            $runner = (new Runner())
+            ->setAnalysis($analysis)
+            ->setContextModule($context_module);
+            $entityManager->persist($runner);
+
+            
+            $analysis->addRunner($runner);
+        }
+        $entityManager->flush();
+        
+        //redirect
+        return $this->redirectToRoute('analysis-pipeline.initialize', ['analysis_hash'=> $analysis->getHash()]);
+    }
+
+    #[Route('/{context_id}/delete', name: 'context.delete')]
+    public function delete(EntityManagerInterface $entityManager, ContextRepository $contextRepository, int $context_id): JsonResponse {
+        $context = $contextRepository->find($context_id);
+        if(!$context) return new JsonResponse(['response' => 'context doesnt exist']);
+        $entityManager->remove($context);
+        $entityManager->flush();
+        return new JsonResponse(['response' => 'context removed']);
     }
 }

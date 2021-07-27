@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block title %}Analysis Result{% endblock %}
+
+{% block body %}
+    <h1>
+        note : 100% lul
+    </h1>
+
+    <div>
+        {% for runner in analysis.runners %}
+            <li>{{ runner.id }} : {{ runner.output }}</li>
+        {% endfor %}
+    </div>
+{% endblock %}

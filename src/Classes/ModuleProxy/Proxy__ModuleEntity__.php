@@ -2,19 +2,21 @@
 
 namespace App\Classes\ModuleProxy;
 
-use App\Classes\ModuleProxy\Nodes\CliParametersNode;
 use App\Entity\Module;
+use Symfony\Component\Yaml\Yaml;
 use App\Exception\FileNotFoundException;
 use App\Exception\MethodNotFoundException;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Yaml\Yaml;
+use App\Classes\ModuleProxy\Nodes\CliParametersNode;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class Proxy__ModuleEntity__ {
     private string $prefix;
     private string $executable_name;
     private string $alias;
+    private array $requirements;
     private CliParametersNode $cli_parameters;
     private FormBuilder $fb;
 
@@ -33,9 +35,19 @@ class Proxy__ModuleEntity__ {
             Yaml::parseFile($module->getDefinitionFile())
         );
 
-        $this->prefix = $definition['prefix'] ?? '';
+        if(!empty($definition['prefix'])){
+            // dd($definition['prefix']);
+            $executableFinder = new ExecutableFinder();
+            // dd($definition, $executableFinder->find($definition['prefix'], null, ['/usr/local/bin']));
+            $this->prefix = $executableFinder->find($definition['prefix'], null, ['/usr/local/bin']);
+        }else{
+            $this->prefix = '';
+        }
+
+        // $this->prefix = $definition['prefix'] ?? '';
         $this->executable_name = $definition['executable_name'];
         $this->alias = $definition['alias'];
+        $this->requirements = $definition['requirements'] ?? [];
 
         $this->cli_parameters = new CliParametersNode(
             $this->prefix,
@@ -60,6 +72,10 @@ class Proxy__ModuleEntity__ {
 
     public function getAlias(): string {
         return $this->alias;
+    }
+
+    public function getRequirements(): array {
+        return $this->requirements;
     }
 
     public function getCliParameters(): CliParametersNode {
@@ -89,6 +105,10 @@ class Proxy__ModuleEntity__ {
                     ->scalarNode('prefix')->cannotBeEmpty()->end()
                     ->scalarNode('executable_name')->cannotBeEmpty()->isRequired()->end()
                     ->scalarNode('alias')->cannotBeEmpty()->isRequired()->end()
+                    ->arrayNode('requirements')
+                        ->requiresAtLeastOneElement()
+                        ->scalarPrototype()->end()
+                    ->end()
                     ->arrayNode('cli_parameters')
                         ->children()
                             ->scalarNode('value_separator')->isRequired()->cannotBeEmpty()->end()

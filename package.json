@@ -45,6 +45,5 @@
     "build": "encore production --progress",
     "lint:check": "eslint assets --ext .tsx",
     "lint:fix": "npm run lint:check --fix"
-  },
-  "dependencies": {}
+  }
 }

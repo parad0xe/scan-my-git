@@ -2,16 +2,16 @@
 
 namespace App\Service;
 
-use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
-use App\Entity\Context;
-use App\Entity\ContextModule;
 use App\Entity\Module;
+use App\Entity\Context;
+use Psr\Log\LoggerInterface;
+use App\Entity\ContextModule;
+use App\Repository\ModuleRepository;
 use App\Exception\FileNotFoundException;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\IllegalArgumentException;
 use App\Repository\ContextModuleRepository;
-use App\Repository\ModuleRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
+use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 
 class ModuleManager {
     public function __construct(
