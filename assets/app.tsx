@@ -14,8 +14,8 @@ const App: React.FC = () => {
         <Navbar />
         <BrowserRouter>
           <Switch>
-            <Route path="/" component={QuickAnalysisForm} />
-            <Route path="/analysis" component={AnalysisPage} />
+            <Route exact path="/" component={QuickAnalysisForm} />
+            <Route exact path="/analysis" component={AnalysisPage} />
           </Switch>
         </BrowserRouter>
       </Layout>
