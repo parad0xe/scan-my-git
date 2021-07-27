@@ -147,18 +147,4 @@ class ContextController extends AbstractController {
 
         return $this->redirectToRoute('analysis.run', ['analysis_hash' => $analysis->getHash()]);
     }
-
-//    #[Route('/{context_id}/delete', name: 'context.delete')]
-//    public function delete(EntityManagerInterface $entityManager, ContextRepository $contextRepository, int $context_id): JsonResponse {
-//        $context = $contextRepository->find($context_id);
-//
-//        if (!$context) {
-//            return new JsonResponse(['response' => ErrorCode::ERROR_FORBIDDEN]);
-//        }
-//
-//        $entityManager->remove($context);
-//        $entityManager->flush();
-//
-//        return new JsonResponse(['response' => 'context removed']);
-//    }
 }
