@@ -10,7 +10,9 @@
         "jsx": "react",
         "esModuleInterop": true
     },
+    "include": ["assets"],
     "exclude": [
-        "./node_modules/**/*"
+        "**/node_modules/*",
+        "**/*.spec.ts"
     ]
 }

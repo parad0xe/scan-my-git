@@ -1,50 +1,80 @@
-import React, {Component, useState} from "react";
-import {render} from "react-dom";
-
+import React, {useEffect, useRef, useState} from "react";
+import { render } from "react-dom";
 
 interface LoadingCirclePropsInterface {
-	name: string;
-	width?: number;
-	bgColor?: string;
-	fColor?: string;
+	width?: string;
+	bgcolor?: string;
+	fcolor?: string;
 	start?: string;
-	perCent: number;
+	progress: number;
+	element: LoadingCircleElement;
+	stroke?: string;
+	text?: string;
 }
-const defaultProps: Partial<LoadingCirclePropsInterface> = {
-	width: 100,
-	bgColor: "#000000",
-	fColor: "#FFFFFF",
-	start: "-Math.PI/2"
-}
-
-interface LoadingCircleStatesInterface {}
 
 const LoadingCircle: React.FC<LoadingCirclePropsInterface> = (
 	props
 ) => {
-	const name = props.name;
-	const width = props.width;
-	const bgColor = props.bgColor;
-	const fColor = props.fColor;
-	const start = props.start;
-	const perCent = props.perCent;
+	const width = parseInt(props.width, 10);
+	const stroke = parseInt(props.stroke, 10);
+	const start = parseInt(props.start, 10);
+	const [progress, setProgress] = useState(props.progress);
+	const [text, setText] = useState(props.text);
+
+	const canvas = useRef(null);
+
+	useEffect(() => {
+		// console.log("progress : "+progress);
+		setProgress(progress)
+		const ctx = canvas.current.getContext('2d');
+		ctx.beginPath();
+		ctx.arc(width/2, width/2, width/2-stroke, start*(2*Math.PI)/360 , progress * (2 * Math.PI)/100 + 0, false);
+		ctx.strokeStyle = props.fcolor;
+		ctx.stroke();
+		//TODO: lerp
+	}, [progress]);
+
+	useEffect(()=> {
+		setProgress(progress)
+		//TODO: display text
+	}, [text])
+
+	useEffect(()=>{
+		props.element.setProgress = setProgress
+
+		const ctx = canvas.current.getContext('2d');
+
+		ctx.lineWidth = stroke;
+		ctx.lineCap = "round";
+
+		//background
+		ctx.beginPath();
+		ctx.arc(width/2, width/2, width/2-stroke, start*(2*Math.PI)/360, 2 * Math.PI, false);
+		ctx.strokeStyle = props.bgcolor;
+		ctx.stroke();
+	}, [])
 
 	return (
-		<div>
-			<p>{props.name}</p>
-		</div>
-	);
+		<>
+			<canvas ref={canvas} width={width} height={width}>
+			</canvas>
+		</>
+	)
 };
 
+
 class LoadingCircleElement extends HTMLElement {
+	setProgress: CallableFunction;
+	setText: CallableFunction;
 	connectedCallback() {
-		const name = this.dataset.name;
-		const width = parseInt(this.dataset.width,10 );
-		const bgColor = this.dataset.bgColor;
-		const fColor = this.dataset.fColor;
-		const start = this.dataset.start;
-		const perCent = parseInt(this.dataset.perCent, 10);
-		render(<LoadingCircle name={name} width={width} bgColor={bgColor} fColor={fColor} start={start} perCent={perCent} />, this);
+		const width = this.getAttribute("width") ?? "200";
+		const bgcolor = this.getAttribute("bgcolor") ?? "#009BBD";
+		const fcolor = this.getAttribute("fcolor") ?? "#006D85";
+		const start = this.getAttribute("start") ?? "0";
+		const stroke = this.getAttribute("stroke") ?? "10";
+		const progress = parseInt(this.getAttribute("progress"), 10) ?? 0;
+		const text = this.getAttribute("text") ?? "";
+		render(<LoadingCircle width={width} bgcolor={bgcolor} fcolor={fcolor} stroke={stroke} text={text} start={start} progress={progress} element={this} />, this);
 	}
 }
 

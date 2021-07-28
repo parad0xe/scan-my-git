@@ -555,6 +555,7 @@ module.exports = {
     }),
     minHeight: {
       0: "0px",
+      10: "10px",
       full: "100%",
       screen: "100vh",
     },

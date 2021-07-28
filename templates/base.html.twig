@@ -8,12 +8,17 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}
-        {% endblock %}
-        {% block javascripts %}
+        <div class="w-4/5 flex flex-col items-center m-auto">
+            {% block body %}
+            {% endblock %}
+        </div>
+
+
         {{ encore_entry_script_tags('app') }}
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+
+        {% block javascripts %}
         {% endblock %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </body>
 </html>
 

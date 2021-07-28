@@ -2,20 +2,21 @@
 {% block title %}Analysis Running{% endblock %}
 
 {% block body %}
-    <h1>Runners</h1>
+    <h1 class="font-bold text-5xl text-white">Runners</h1>
 
-    <div class="container">
+        <loading-circle id="loading1" width="200" stroke="20" bgcolor="#009BBD" fcolor="#006D85" progress="0"></loading-circle>
+        <row-component leftText="Test1" rightText="Test2" dropdown >
+            <p>testsetst</p>
+        </row-component>
         <div>
             Runners status: <span class="percent">0</span> <span>%</span>
         </div>
-        <LoadingCircle name="" />
         <div class="status"></div>
 
         <div style="margin-top: 40px">
             <h2>Logs</h2>
             <pre class="logs" style="word-wrap: break-word; overflow: auto; height: 60vh;"></pre>
         </div>
-    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -62,7 +63,14 @@
             };
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            let progress=0;
+            setInterval(() => {
+                // console.log(progress)
+                progress += 10
+                document.getElementById("loading1").setProgress(progress)
+            }, 1000)
+
             const analysis_hash = '{{ analysis.hash }}'
             const runners_id = JSON.parse('{{ runners_id | json_encode }}')
             let percent = 0
@@ -86,6 +94,9 @@
                     }).then(() => {
                         document.querySelector(`[runner-id='${runner_id}'] .runner-status`).textContent = `Finish`
                         document.querySelector(".percent").textContent = ((++percent * 100) / runners_id.length).toString()
+                        document.getElementById("loading1").setProgress((percent*100)/runners_id.length)
+
+
                     })
                 })
 
@@ -93,7 +104,7 @@
                 Promise.all(promises).then(async () => {
                     document.querySelector(".status").innerHTML += "<div>Cleaning..</div>"
                     console.log(`FINISHED.. cleaning`)
-                    await process(`/analysis/${analysis_hash}/clean`)
+                    // await process(`/analysis/${analysis_hash}/clean`)
                     console.log(`FINISHED.. ok`)
                     // window.location.replace("result")
                 })
