@@ -1,9 +1,10 @@
 import React from "react";
+import { render } from "react-dom";
 
 const Navbar: React.FC = () => {
   return (
     <nav className="shadow bg-navColor">
-      <div className="container px-6 py-3 mx-auto md:flex md:justify-between md:items-center">
+      <div className="px-6 py-3 mx-auto md:flex md:justify-between md:items-center">
         <div className="flex items-center justify-between">
           <div>
             <a
@@ -43,4 +44,10 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+class NavbarElement extends HTMLElement {
+  connectedCallback() {
+    render(<Navbar />, this);
+  }
+}
+
+customElements.define("navbar-application", NavbarElement);

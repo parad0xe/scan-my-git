@@ -12,6 +12,7 @@
     </head>
     <body>
     <div class="container">
+    <navbar-application></navbar-application>
             {% for flash_message in app.session.flashbag.get('error') %}
                 <div class="alert alert-danger">
                     {{ flash_message }}
