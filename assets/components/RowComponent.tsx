@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { render } from "react-dom";
 import arrow from './../img/arrow-right.png';
+import parse from 'html-react-parser'
 
 
 interface RowComponentPropsInterface {
@@ -15,15 +16,20 @@ interface RowComponentPropsInterface {
 const RowComponent: React.FC<RowComponentPropsInterface> = (
 	props
 ) => {
-	const [active, setActive] = useState(false);
-	function isActive(){
-		if(active===true){
-			setActive(false);
-		}else{
-			setActive(true);
-		}
+	const children_container = useRef(null);
 
+	const [active, setActive] = useState(false);
+
+	function dropdownToggle(){
+		setActive(!active)
 	}
+
+	// useEffect(() => {
+	// 	props.element.HTMLNodes.map((item) => {
+	// 		children_container.current.innerHTML += item.outerHTML
+	// 	})
+	// }, [])
+
 	return (
 		<>
 			<div className={`flex justify-between bg-white ${active ? "active" : ""}`}>
@@ -40,16 +46,13 @@ const RowComponent: React.FC<RowComponentPropsInterface> = (
 					</div>
 					{!props.dropdown
 						? ""
-						: <img src={arrow} alt="" className={`transform duration-150 ${active ? "rotate-90": ""}`} onClick={isActive}/>
+						: <img src={arrow} alt="" className={`transform duration-150 ${active ? "rotate-90": ""}`} onClick={dropdownToggle}/>
 					}
 				</div>
-				{props.element.children[0].innerHTML}
 			</div>
 			{!props.dropdown
 				? ""
-				:	<div className={`bg-gray-300 min-h-10${active ? "" : "hidden"}`}>
-
-					</div>
+				:	<div ref={children_container} className={`bg-gray-300 min-h-10 ${active ? "" : "hidden"}`}>{props.element.HTMLNodes.map(item => parse(item))}</div>
 			}
 		</>
 	);
@@ -61,18 +64,21 @@ const RowComponent: React.FC<RowComponentPropsInterface> = (
 
 
 class RowComponentElement extends HTMLElement {
+	HTMLNodes: Array<string>;
+
 	constructor(){
 		super();
 		this.classList.add("w-9/12");
 		this.classList.add("test");
-
+		this.HTMLNodes = Array.from([...this.children]).map(item => item.outerHTML)
 	}
+
 	connectedCallback() {
 		const leftText = this.getAttribute("leftText");
 		const rightText = this.getAttribute("rightText");
 		const subText = this.getAttribute("subText");
 		const dropdown = (this.getAttribute("dropdown") !== null);
-		render(<RowComponent leftText={leftText} rightText={rightText} subText={subText} dropdown={dropdown} element={this} ></RowComponent>, this);
+		render(<RowComponent leftText={leftText} rightText={rightText} subText={subText} dropdown={dropdown} element={this}/>, this);
 	}
 }
 
