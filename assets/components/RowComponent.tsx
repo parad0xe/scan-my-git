@@ -49,7 +49,7 @@ const RowComponent: React.FC<RowComponentPropsInterface> = (
 					</div>
 					{!props.dropdown
 						? ""
-						: <img src={arrow} alt="" className={`transform duration-150 w-px h-auto ${active ? "rotate-90": ""}`} onClick={dropdownToggle}/>
+						: <img src={arrow} alt="" className={`transform duration-150 w-px h-auto cursor-pointer ${active ? "rotate-90": ""}`} onClick={dropdownToggle}/>
 					}
 				</div>
 			</div>
