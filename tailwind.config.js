@@ -6,6 +6,7 @@ module.exports = {
   presets: [],
   darkMode: false, // or 'media' or 'class'
   theme: {
+
     screens: {
       sm: "640px",
       md: "768px",
@@ -16,7 +17,7 @@ module.exports = {
     colors: {
       transparent: "transparent",
       current: "currentColor",
-      navColor: "#019FC1",
+      navColor: "#0888a4",
       blueWallpaper: "#00ADD3",
       black: colors.black,
       white: colors.white,
@@ -30,7 +31,7 @@ module.exports = {
       pink: colors.pink,
     },
     spacing: {
-      px: "1px",
+      px: "20px",
       0: "0px",
       0.5: "0.125rem",
       1: "0.25rem",
@@ -146,6 +147,7 @@ module.exports = {
     borderOpacity: (theme) => theme("opacity"),
     borderRadius: {
       none: "0px",
+      "3": "3px",
       sm: "0.125rem",
       DEFAULT: "0.25rem",
       md: "0.375rem",
