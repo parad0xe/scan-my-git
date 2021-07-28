@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {render} from 'react-dom';
 
 interface ButtonComponentPropsInterface {
@@ -6,32 +6,29 @@ interface ButtonComponentPropsInterface {
 	link: string;
 	shadow: boolean;
 	raised: boolean;
+	disabled: boolean;
+	element: ButtonComponentElement;
 }
 
 const ButtonComponent: React.FC<ButtonComponentPropsInterface> = (props) => {
+	const $a = useRef(null)
+	const [disabled, setDisabled] = useState(props.disabled)
+
 	useEffect(() => {
+		props.element.setDisabled = setDisabled
+	}, [])
 
-	}, []);
-
-	const link_class = ["p-2"]
-	const button_class = ["rounded"]
-
-	if(props.raised) {
-		link_class.push("border-white border-2 bg-blueWallpaper")
-		button_class.push("text-white")
-	} else {
-		link_class.push("bg-white border-2 border-blueWallpaper")
-		button_class.push("text-blueWallpaper")
-	}
-
-	if(props.shadow) {
-		link_class.push("shadow-md")
+	const handleClick = (e) => {
+		if(disabled) {
+			e.preventDefault()
+			e.stopPropagation()
+		}
 	}
 
 	return (
 		<>
-			<a href={props.link} className={link_class.join(" ")}>
-				<button className={button_class.join(" ")}>
+			<a ref={$a} href={props.link} className={`p-2 border-2 ${props.raised ? "border-white bg-blueWallpaper" : "bg-white border-blueWallpaper"} ${disabled ? "cursor-default opacity-70" : ""}`} onClick={handleClick}>
+				<button className={`rounded ${props.raised ? "text-white" : "text-blueWallpaper"} ${props.shadow ? "shadow-md" : ""} ${disabled ? "cursor-default" : ""}`}>
 					{props.label}
 				</button>
 			</a>
@@ -41,12 +38,15 @@ const ButtonComponent: React.FC<ButtonComponentPropsInterface> = (props) => {
 
 
 class ButtonComponentElement extends HTMLElement {
+	setDisabled: CallableFunction;
+
 	connectedCallback() {
 		const label = this.getAttribute("label");
 		const link = this.getAttribute("link");
 		const raised = (this.getAttribute("raised") !== null);
 		const shadow = (this.getAttribute("shadow") !== null);
-		render(<ButtonComponent link={link} label={label} raised={raised} shadow={shadow}/>, this);
+		const disabled = (this.getAttribute("disabled") !== null);
+		render(<ButtonComponent link={link} label={label} raised={raised} disabled={disabled} shadow={shadow} element={this}/>, this);
 	}
 }
 

@@ -1,5 +1,6 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {render} from 'react-dom';
+import stripAnsi from 'strip-ansi';
 
 interface RunnerComponentPropsInterface {
 	name: string;
@@ -8,18 +9,11 @@ interface RunnerComponentPropsInterface {
 }
 
 const RunnerComponent: React.FC<RunnerComponentPropsInterface> = (props) => {
-	const output = props.output.replace(/((\\033)|\\e)\[[0-9;]*m/,"")
-
-	useEffect(() => {
-
-	}, [])
-
 	return (
 		<>
 			<div className="p-4 text-left mt-12">
 				<div>{props.name}</div>
-				<pre>{output}</pre>
-				<div>OK</div>
+				<pre>{stripAnsi(props.output)}</pre>
 			</div>
 		</>
 	);

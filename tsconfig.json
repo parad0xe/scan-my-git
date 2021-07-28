@@ -8,11 +8,15 @@
         "removeComments": true,
         "sourceMap": true,
         "jsx": "react",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "typeRoots": [
+            "./node_modules/@types",
+        ],
+        "declaration": true
     },
     "include": ["assets"],
     "exclude": [
-        "**/node_modules/*",
+        "node_modules",
         "**/*.spec.ts"
     ]
 }
