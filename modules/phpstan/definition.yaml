@@ -17,7 +17,7 @@ module:
                 input:
                     type: number
                     attributes: { min: 2, max: 8 }
-                default: 2
+                default: 3
                 required: true
 
             -   identifier: 04264DA2B7594C2AE326748260EBD51BD643C0AD

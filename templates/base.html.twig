@@ -3,17 +3,63 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %} Symfony! {% endblock %}</title>
+
+        {{ encore_entry_link_tags('app') }}
+
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
         {% endblock %}
     </head>
+
     <body>
-        {% block body %}
-        {% endblock %}
-        {% block javascripts %}
+        <nav class="shadow bg-navColor">
+            <div class="px-6 py-3 mx-auto md:flex md:justify-between md:items-center">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="{{ asset('build/images/logo.png') }}" alt="logo Scan My Git" width="60"/>
+                        <a class="ml-4 text-xl font-bold text-white dark:text-white md:text-2xl hover:text-gray-700 dark:hover:text-gray-300"
+                           href="{{ path('home') }}">
+                            Scan My Git
+                        </a>
+                    </div>
+                    <div class="flex md:hidden">
+                        <button
+                                type="button"
+                                class="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400"
+                                aria-label="toggle menu">
+                            <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current">
+                                <path fill-rule="evenodd"
+                                      d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="w-4/5 flex flex-col items-center m-auto">
+            {% for flash_message in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger">
+                    {{ flash_message }}
+                </div>
+            {% endfor %}
+
+            {% for flash_message in app.session.flashbag.get('success') %}
+                <div class="alert alert-success">
+                    {{ flash_message }}
+                </div>
+            {% endfor %}
+
+            {% block body %}
+            {% endblock %}
+        </div>
+
         {{ encore_entry_script_tags('app') }}
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+
+        {% block javascripts %}
         {% endblock %}
+
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </body>
 </html>
 
