@@ -12,7 +12,6 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
 class Proxy__ModuleEntity__ {
-
     private string $prefix;
     private string $executable_name;
     private string $alias;
@@ -21,6 +20,10 @@ class Proxy__ModuleEntity__ {
     private FormBuilder $fb;
 
     /**
+     * Proxy__ModuleEntity__ constructor.
+     *
+     * @param Module $module
+     *
      * @throws FileNotFoundException
      */
     public function __construct(
@@ -41,7 +44,6 @@ class Proxy__ModuleEntity__ {
             $this->prefix = '';
         }
 
-        // $this->prefix = $definition['prefix'] ?? '';
         $this->executable_name = $definition['executable_name'];
         $this->alias = $definition['alias'];
         $this->requirements = $definition['requirements'] ?? [];
@@ -85,6 +87,7 @@ class Proxy__ModuleEntity__ {
     }
 
     /**
+     * Forward module methods that doesn't exist on the proxy to the proxy.
      * @throws MethodNotFoundException
      */
     public function __call(string $name, array $arguments): mixed {

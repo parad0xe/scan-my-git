@@ -3,7 +3,11 @@
 
 namespace App\Classes\Errors;
 
-
+/**
+ * Class to index our error codes
+ * Class ErrorCode
+ * @package App\Classes\Errors
+ */
 class ErrorCode {
     const ERROR_INTERNAL = '[code: 0-i10] Erreur';
     const ERROR_INVALID_ARGUMENTS = '[code: 0-i11] Erreur';

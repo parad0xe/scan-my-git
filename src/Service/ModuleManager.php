@@ -13,6 +13,11 @@ use App\Exception\IllegalArgumentException;
 use App\Repository\ContextModuleRepository;
 use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 
+/**
+ *
+ * Class ModuleManager
+ * @package App\Service
+ */
 class ModuleManager {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -22,7 +27,11 @@ class ModuleManager {
     ) {
     }
 
-    /** @return Proxy__ModuleEntity__[] */
+
+    /** Load an array of modules with a specific ID or every modules if no context given
+     * @param Context|null $context
+     * @return Proxy__ModuleEntity__[]
+     */
     public function loadAll(Context $context = null): array {
         $modules = $this->moduleRepository->findAll();
 
