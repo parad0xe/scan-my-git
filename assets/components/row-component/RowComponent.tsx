@@ -40,7 +40,7 @@ const RowComponent: React.FC<RowComponentPropsInterface> = (
 					<p>{props.leftText}</p>
 				</div>
 				<div className="right m-4 flex">
-					<div className="flex flex-col justify-center">
+					<div className="flex flex-col justify-center mr-2">
 						<div>{text!==""? parse(text) : text}</div>
 						{ !props.subText
 							? ""
@@ -55,7 +55,7 @@ const RowComponent: React.FC<RowComponentPropsInterface> = (
 			</div>
 			{!props.dropdown
 				? ""
-				:	<div ref={children_container} className={`bg-gray-300 min-h-10 rounded-b-3 p-3 ${active ? "" : "hidden"}`}>{props.element.HTMLNodes.map(item => parse(item))}</div>
+				:	<div ref={children_container} className={`bg-gray-300 min-h-10 rounded-b-3 p-3 mb-4 ${active ? "" : "hidden"}`}>{props.element.HTMLNodes.map(item => parse(item))}</div>
 			}
 		</>
 	);
@@ -69,7 +69,6 @@ class RowComponentElement extends HTMLElement {
 	constructor(){
 		super();
 		this.classList.add("w-9/12");
-		this.classList.add("test");
 		this.classList.add("m-2");
 		this.HTMLNodes = Array.from([...this.children]).map(item => item.outerHTML)
 	}

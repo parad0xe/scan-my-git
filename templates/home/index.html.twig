@@ -5,7 +5,9 @@
 {% block body %}
 
     <quick-analysis-form
+            className="w-4/5"
             data-action="{{ path('context.quick-analysis') }}"
-            data-token="{{ csrf_token("token") }}" />
+            data-token="{{ csrf_token("token") }}">
+    </quick-analysis-form>
 
 {% endblock %}

@@ -11,7 +11,7 @@ interface RunnerComponentPropsInterface {
 const RunnerComponent: React.FC<RunnerComponentPropsInterface> = (props) => {
 	return (
 		<>
-			<div className="p-4 text-left mt-12">
+			<div className="p-4 text-left">
 				<div>{props.name}</div>
 				<pre>{stripAnsi(props.output)}</pre>
 			</div>

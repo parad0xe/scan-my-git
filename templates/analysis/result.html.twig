@@ -2,22 +2,33 @@
 {% block title %}Analysis Result{% endblock %}
 
 {% block body %}
-    <h1 class="font-bold text-5xl text-white">Analysis Result</h1>
+    <h1 class="font-bold text-5xl text-white mt-8">Résultat d'analyse</h1>
 
-    <div>
-        <row-component dropdown open leftText="Module {{ runner.contextModule.module.name }}" rightText="Résultat">
-            {% for runner in analysis.runners %}
+    <div class="w-4/5">
+        <div class="flex justify-end my-3">
+            <button-component
+                    raised
+                    label="Nouvelle analyse"
+                    link="{{ path('home') }}">
+            </button-component>
+        </div>
+
+        {% for runner in analysis.runners %}
+            <row-component key="{{ runner.id }}" dropdown open leftText="Module {{ runner.contextModule.module.name }}">
                 <runner-component
+                        key="child_{{ runner.id }}"
                         name="{{ runner.contextModule.module.name }}"
                         output="{{ runner.output }}">
                 </runner-component>
-            {% endfor %}
-        </row-component>
+            </row-component>
+        {% endfor %}
 
-        <button-component
-                raised
-                label="Back to Home"
-                link="{{ path('home') }}">
-        </button-component>
+        <div class="flex justify-end mb-8">
+            <button-component
+                    raised
+                    label="Nouvelle analyse"
+                    link="{{ path('home') }}">
+            </button-component>
+        </div>
     </div>
 {% endblock %}

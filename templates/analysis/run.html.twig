@@ -2,7 +2,7 @@
 {% block title %}Analysis Running{% endblock %}
 
 {% block body %}
-    <h1 class="font-bold text-5xl text-white">Analyse</h1>
+    <h1 class="font-bold text-5xl text-white mt-4">Analyse</h1>
 
     <loading-circle-component id="progress" width="200" stroke="20" bgcolor="#009BBD" fcolor="#006D85" progress="0" text="0%"></loading-circle-component>
 
@@ -19,13 +19,15 @@
         <pre class="logs" style="word-wrap: break-word; overflow: auto; height: 60vh;"></pre>
     </row-component>
 
-    <button-component
-            id="btn-see-result"
-            raised
-            disabled
-            label="Voir le résultat"
-            link="{{ path('analysis.result', {analysis_hash: analysis.hash}) }}">
-    </button-component>
+    <div class="w-3/4 flex justify-end my-3">
+        <button-component
+                id="btn-see-result"
+                raised
+                disabled
+                label="Voir le résultat"
+                link="{{ path('analysis.result', {analysis_hash: analysis.hash}) }}">
+        </button-component>
+    </div>
 
 {% endblock %}
 

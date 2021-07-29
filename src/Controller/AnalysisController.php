@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AnalysisController extends AbstractController {
 
     #[Route('/{analysis_hash}/start', name: 'analysis.run', methods: ['GET'])]
-    public function start(AnalysisRepository $analysisRepository, string $analysis_hash): Response {
+    public function run(AnalysisRepository $analysisRepository, string $analysis_hash): Response {
         $analysis = $analysisRepository->findOneBy(['hash' => $analysis_hash]);
 
         if (!$analysis || $analysis->getStartedAt() !== null) {
@@ -38,8 +38,6 @@ class AnalysisController extends AbstractController {
             $this->addFlash("error", ErrorCode::ERROR_FORBIDDEN);
             return $this->redirectToRoute("context.index");
         }
-
-        dump($analysis->getRunners()->toArray());
 
         return $this->render('analysis/result.html.twig', [
             'analysis' => $analysis
