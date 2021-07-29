@@ -2,17 +2,21 @@
 
 namespace App\Service;
 
-use App\Entity\Module;
+use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
 use App\Entity\Context;
-use Psr\Log\LoggerInterface;
 use App\Entity\ContextModule;
-use App\Repository\ModuleRepository;
+use App\Entity\Module;
 use App\Exception\FileNotFoundException;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\IllegalArgumentException;
 use App\Repository\ContextModuleRepository;
-use App\Classes\ModuleProxy\Proxy__ModuleEntity__;
+use App\Repository\ModuleRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Class ModuleManager.
+ * @package App\Service
+ */
 class ModuleManager {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -22,7 +26,10 @@ class ModuleManager {
     ) {
     }
 
-    /** @return Proxy__ModuleEntity__[] */
+    /** Load an array of modules with a specific ID or every modules if no context given
+     * @param Context|null $context
+     * @return Proxy__ModuleEntity__[]
+     */
     public function loadAll(Context $context = null): array {
         $modules = $this->moduleRepository->findAll();
 
