@@ -115,8 +115,10 @@ class AnalysisPipelineController extends AbstractController {
             return new JsonResponse(['success' => false, 'reason' => ErrorCode::ERROR_PROCESS_TIMEOUT]);
         }
 
+        $output = str_replace($gitManager->getPath($analysis), ".", $process->getOutput());
+
         $runner->setFinishedAt(new \DateTimeImmutable());
-        $runner->setOutput($process->getOutput());
+        $runner->setOutput($output);
 
         $entityManager->persist($runner);
         $entityManager->flush();
