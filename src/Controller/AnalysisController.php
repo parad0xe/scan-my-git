@@ -39,6 +39,8 @@ class AnalysisController extends AbstractController {
             return $this->redirectToRoute("context.index");
         }
 
+        dump($analysis->getRunners()->toArray());
+
         return $this->render('analysis/result.html.twig', [
             'analysis' => $analysis
         ]);
