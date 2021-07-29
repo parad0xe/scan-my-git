@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+{% block title %}Analysis Running{% endblock %}
+
+{% block body %}
+    <h1 class="font-bold text-5xl text-white mt-4">Analyse</h1>
+
+    <loading-circle-component id="progress" width="200" stroke="20" bgcolor="#009BBD" fcolor="#006D85" progress="0" text="0%"></loading-circle-component>
+
+    <row-component id="init" leftText="Initialisation du repository" rightText="Initialisation"></row-component>
+
+    {% for runner in analysis.runners %}
+        <row-component id="{{ runner.id }}" leftText="Module {{ runner.contextModule.module.name }}" rightText="En attente"></row-component>
+    {% endfor %}
+
+    <row-component id="clean" leftText="Finalisation" rightText="En attente"></row-component>
+
+
+    <row-component leftText="Logs" dropdown open>
+        <pre class="logs" style="word-wrap: break-word; overflow: auto; height: 60vh;"></pre>
+    </row-component>
+
+    <div class="w-3/4 flex justify-end my-3">
+        <button-component
+                id="btn-see-result"
+                raised
+                disabled
+                label="Voir le résultat"
+                link="{{ path('analysis.result', {analysis_hash: analysis.hash}) }}">
+        </button-component>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script defer type="text/javascript">
+        const process = function (url) {
+            const request = new Request(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'json'
+                },
+                mode: 'cors',
+                cache: 'default'
+            })
+
+            return new Promise((resolve, reject) => {
+                fetch(request).then((response) => {
+                    console.log(response)
+                    if (!response.ok) {
+                        return reject()
+                    }
+
+                    response.json().then((data) => {
+                        console.log(data)
+                        if (data.success === false) {
+                            return reject()
+                        }
+
+                        resolve()
+                    })
+                }).catch(() => {
+                    return reject(false)
+                })
+            })
+        }
+
+        const handle_log = function (topic) {
+            const url = new URL('http://localhost:9090/.well-known/mercure')
+            url.searchParams.append('topic', topic)
+
+            const eventSource = new EventSource(url)
+            eventSource.onmessage = ({ data }) => {
+                data = JSON.parse(data)
+                document.querySelector('.logs').innerHTML += `<div style="white-space: pre-wrap;">${data.log}</div>`
+                document.querySelector('.logs').scrollTop = document.querySelector('.logs').scrollHeight
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const analysis_hash = '{{ analysis.hash }}'
+            const runners_id = JSON.parse('{{ runners_id | json_encode }}')
+            let percent = 0
+
+            handle_log(`${analysis_hash}/logs`)
+
+            // Initialize downloaded project
+            document.getElementById("init").setText("En cours..")
+            process(`/analysis/${analysis_hash}/initialize`).then(() => {
+
+                document.getElementById("progress").setProgress(percent += 20)
+                document.getElementById("progress").setText(percent + "%")
+                document.getElementById("init").setText("Terminé &#9989;")
+
+                // Start runners
+                const promises = runners_id.map((runner_id) => {
+                    document.getElementById(runner_id).setText("En cours..")
+                    return process(`/analysis/${analysis_hash}/run/${runner_id}`).then(() => {
+                    }).then(() => {
+                        document.getElementById(runner_id).setText("Terminé &#9989;")
+                        document.getElementById("progress").setProgress(percent += (60 / runners_id.length))
+                        document.getElementById("progress").setText(percent + "%")
+
+
+                    })
+                })
+
+                // Clean downloaded project
+                Promise.all(promises).then(async () => {
+                    document.getElementById("clean").setText("En cours..")
+                    await process(`/analysis/${analysis_hash}/clean`)
+                    document.getElementById("clean").setText("Terminé &#9989;")
+                    document.getElementById("progress").setProgress(percent += 20)
+                    document.getElementById("progress").setText(percent + "%")
+
+                    document.getElementById("btn-see-result").setDisabled(false)
+                    // window.location.replace("result")
+                })
+            }).catch(() => {
+                console.error(`ERROR.. cleaning`)
+                // Clean downloaded project
+                // process(`/analysis/${analysis_hash}/clean`)
+            })
+        })
+    </script>
+{% endblock %}

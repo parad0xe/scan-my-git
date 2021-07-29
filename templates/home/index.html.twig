@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Scan my Git {% endblock %}
+
+{% block body %}
+
+    <quick-analysis-form
+            className="w-4/5"
+            data-action="{{ path('context.quick-analysis') }}"
+            data-token="{{ csrf_token("token") }}">
+    </quick-analysis-form>
+
+{% endblock %}

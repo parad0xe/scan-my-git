@@ -1,31 +1,69 @@
 version: '3.8'
 
 services:
-  app: 
-    container_name: app
-    build: ./
-    ports:
-      - 3000:8000
-    volumes:
-      - ./:/var/www/html
-  phpmyadmin:
-    image: phpmyadmin
-    restart: always
-    ports:
-      - 8080:80
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOST=database
-      - PMA_USER=root
-      - PMA_PASSWORD=root
-  database:
-    image: 'mariadb:latest'
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: scan_my_git
-    ports:
-      # To allow the host machine to access the ports below, modify the lines below.
-      # For example, to allow the host to connect to port 3306 on the container, you would change
-      # "3306" to "3306:3306". Where the first port is exposed to the host and the second is the container port.
-      # See https://docs.docker.com/compose/compose-file/#ports for more information.
-      - '3306'
+    php-fpm:
+        container_name: php-fpm
+        build:
+            context: ./docker/php
+        ports:
+            - 9000:9001
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - database
+
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: phpmyadmin
+        restart: always
+        ports:
+            - 8080:80
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=database
+            - PMA_USER=root
+            - PMA_PASSWORD=root
+
+    nginx:
+        tty: true
+        container_name: nginx
+        build:
+            context: ./docker/nginx
+        ports:
+            - 3000:8080
+        depends_on:
+            - php-fpm
+        volumes:
+            - ./:/var/www/html
+            - ./logs/nginx:/var/log/nginx
+
+    database:
+        image: 'mariadb:latest'
+        container_name: database
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: scan_my_git
+        ports:
+            - '3306'
+
+    mercure:
+        tty: true
+        image: dunglas/mercure
+        container_name: mercure
+        restart: unless-stopped
+        environment:
+            DEBUG: "debug"
+            # Uncomment the following line to disable HTTPS
+            SERVER_NAME: ':80'
+            ADDR: '127.0.0.1:9090'
+            CORS_ALLOWED_ORIGINS: '127.0.0.1:3000'
+            ALLOW_ANONYMOUS: 1
+            MERCURE_PUBLISHER_JWT_KEY: 'super-secret'
+            MERCURE_SUBSCRIBER_JWT_KEY: 'super-secret'
+            MERCURE_EXTRA_DIRECTIVES: |-
+                cors_origins "http://localhost:3000", "http://127.0.0.1:3000"
+                anonymous
+        # Uncomment the following line to enable the development mode
+#        command: /usr/bin/caddy run -config /etc/caddy/Caddyfile.dev
+        ports:
+            - "9090:80"

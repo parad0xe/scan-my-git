@@ -1,5 +1,11 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
+    profiler: { enabled: false, collect: false }
+
+    cache:
+        app: cache.adapter.filesystem
+        system: cache.adapter.system
+
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
     http_method_override: false

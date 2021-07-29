@@ -1,0 +1,17 @@
+module:
+    executable_name: php-security-checker
+    alias: PHP Security Checker
+    requirements:
+        - composer.lock
+    cli_parameters:
+        value-separator: " "
+
+        parameters:
+            -   identifier: ff2d9c872ae8cf27a391728a9105b8f78dd2672a
+                label: Path
+                name: -path
+                input:
+                    type: text
+                    attributes: { maxlength: 50 }
+                default: .
+                required: true
