@@ -14,8 +14,11 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Everything related to git (clone, delete, path of an analysis)
+ * Class GitRepositoryManager.
+ */
 class GitRepositoryManager {
-
     private string $targetDirectory = '/var/www/html/downloads/github/';
     private array $validHosts = ['github.com'];
 
@@ -29,8 +32,9 @@ class GitRepositoryManager {
         $filesystem = new Filesystem();
 
         //test if context is valid
-
-        if (!$this->isValid($context)) return false;
+        if (!$this->isValid($context)) {
+            return false;
+        }
 
         $path = $this->getPath($analysis);
 
@@ -51,6 +55,7 @@ class GitRepositoryManager {
             $filesystem->mkdir($path, 0666);
         } catch (IOException $e) {
             $this->logger->error($e->getMessage());
+
             return false;
         }
 
@@ -64,6 +69,7 @@ class GitRepositoryManager {
         } catch (ProcessFailedException | ProcessTimedOutException $e) {
             $this->logger->error($e->getMessage());
             $this->delete($analysis);
+
             return false;
         }
 
@@ -78,7 +84,6 @@ class GitRepositoryManager {
     }
 
     public function delete(Analysis $analysis): bool {
-        //remove from the folder
         $path = $this->getPath($analysis);
 
         Utils::rrmdir($path);
@@ -88,9 +93,13 @@ class GitRepositoryManager {
 
     public function exist(Analysis $analysis): bool {
         $path = $this->getPath($analysis);
+
         return (new Filesystem())->exists($path);
     }
 
+    /**
+     * Verify if the url is from an authorized host.
+     */
     public function isValid(Context $context): bool {
         if (!in_array(parse_url($context->getGithubUrl(), PHP_URL_HOST), $this->validHosts)) {
             return false;
@@ -101,9 +110,13 @@ class GitRepositoryManager {
 
     public function getPath(Analysis $analysis): string {
         $dirName = sha1($analysis->getId());
-        return $this->targetDirectory . $dirName;
+
+        return $this->targetDirectory.$dirName;
     }
 
+    /**
+     * Verify if the projet have the requirements to run a module.
+     */
     public function support(Analysis $analysis, Proxy__ModuleEntity__ $proxy): bool {
         $finder = new Finder();
         $path = $this->getPath($analysis);
@@ -112,10 +125,11 @@ class GitRepositoryManager {
 
         foreach ($reqs as $req) {
             $finder->files()->name($req)->in($path);
-            if ($finder->count() === 0) {
+            if (0 === $finder->count()) {
                 return false;
             }
         }
+
         return true;
     }
 }
