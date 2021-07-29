@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const Encore = require("@symfony/webpack-encore")
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
+const Encore = require("@symfony/webpack-encore");
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
 if (!Encore.isRuntimeEnvironmentConfigured()) {
-    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev")
+  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev");
 }
 
 // uncomment to get integrity="..." attributes on your script & link tags
@@ -13,78 +13,89 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 //.enableIntegrityHashes(Encore.isProduction())
 
 Encore
-    // directory where compiled assets will be stored
-    .setOutputPath("public/build/")
-    // public path used by the web server to access the output path
-    .setPublicPath("/build")
-    // only needed for CDN's or sub-directory deploy
-    //.setManifestKeyPrefix('build/')
-    .cleanupOutputBeforeBuild()
+  // directory where compiled assets will be stored
+  .setOutputPath("public/build/")
+  // public path used by the web server to access the output path
+  .setPublicPath("/build")
+  // only needed for CDN's or sub-directory deploy
+  //.setManifestKeyPrefix('build/')
+  .cleanupOutputBeforeBuild()
 
-    /*
-     * ENTRY CONFIG
-     *
-     * Each entry will result in one JavaScript file (e.g. app.js)
-     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
-     */
-    .addEntry("app", "./assets/app.tsx")
+  .copyFiles({
+    from: "./assets/img",
 
-    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    .enableStimulusBridge("./assets/controllers.json")
+    // if versioning is enabled, add the file hash too
+    to: "images/[path][name].[hash:8].[ext]",
 
-    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-    .splitEntryChunks()
+    // only copy files matching this pattern
+    pattern: /\.(png|jpg|jpeg)$/,
+  })
 
-    // will require an extra script tag for runtime.js
-    // but, you probably want this, unless you're building a single-page app
-    .enableSingleRuntimeChunk()
+  /*
+   * ENTRY CONFIG
+   *
+   * Each entry will result in one JavaScript file (e.g. app.js)
+   * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
+   */
+  .addEntry("app", "./assets/app.tsx")
 
-    /*
-     * FEATURE CONFIG
-     *
-     * Enable & configure other features below. For a full
-     * list of features, see:
-     * https://symfony.com/doc/current/frontend.html#adding-more-features
-     */
-    .enableBuildNotifications()
+  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+  .enableStimulusBridge("./assets/controllers.json")
 
-    .configureBabel((config) => {
-        config.plugins.push("@babel/plugin-proposal-class-properties")
-    })
+  // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
+  .splitEntryChunks()
 
-    // enables @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = "usage"
-        config.corejs = 3
-    })
+  // will require an extra script tag for runtime.js
+  // but, you probably want this, unless you're building a single-page app
+  .enableSingleRuntimeChunk()
 
-    // enables Sass/SCSS support
-    // .enableSassLoader(function(options) {}, { resolveUrlLoader: false })
-    .enablePostCssLoader()
+  /*
+   * FEATURE CONFIG
+   *
+   * Enable & configure other features below. For a full
+   * list of features, see:
+   * https://symfony.com/doc/current/frontend.html#adding-more-features
+   */
+  .enableBuildNotifications()
 
-    // uncomment if you use TypeScript
-    .enableTypeScriptLoader()
-    .enableForkedTypeScriptTypesChecking()
+  .configureBabel((config) => {
+    config.plugins.push("@babel/plugin-proposal-class-properties");
+  })
 
-    // uncomment if you use React
-    .enableReactPreset()
+  // enables @babel/preset-env polyfills
+  .configureBabelPresetEnv((config) => {
+    config.useBuiltIns = "usage";
+    config.corejs = 3;
+  })
 
-    .enableSourceMaps(!Encore.isProduction())
-    // enables hashed filenames (e.g. app.abc123.css)
-    .enableVersioning(Encore.isProduction())
+  // enables Sass/SCSS support
+  // .enableSassLoader(function(options) {}, { resolveUrlLoader: false })
+  .enablePostCssLoader()
+
+  // uncomment if you use TypeScript
+  .enableTypeScriptLoader()
+  .enableForkedTypeScriptTypesChecking()
+
+  // uncomment if you use React
+  .enableReactPreset()
+
+  .enableSourceMaps(!Encore.isProduction())
+  // enables hashed filenames (e.g. app.abc123.css)
+  .enableVersioning(Encore.isProduction());
 
 // uncomment if you're having problems with a jQuery plugin
 //.autoProvidejQuery()
 
 Encore.configureWatchOptions(function (watchOptions) {
-    watchOptions.poll = 250
-    watchOptions.ignored = /node_modules/
-})
+  watchOptions.poll = 250;
+  watchOptions.ignored = /node_modules/;
+});
 
-let webpack_config = Encore.getWebpackConfig()
+let webpack_config = Encore.getWebpackConfig();
 
-webpack_config.module.rules[0].exclude = /node_modules\/(?!(autotrack|dom-utils))/
+webpack_config.module.rules[0].exclude =
+  /node_modules\/(?!(autotrack|dom-utils))/;
 
 // webpack_config = (new SpeedMeasurePlugin()).wrap(webpack_config)
 
-module.exports = webpack_config
+module.exports = webpack_config;
