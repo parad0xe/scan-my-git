@@ -1,9 +1,9 @@
-import React, {useState} from "react";
-import {render} from 'react-dom';
-import Recaptcha from "react-recaptcha";
 
-import Title from "../../Widgets/Title";
+import React, { useState } from "react";
+import Recaptcha from "react-recaptcha";
 import Button from "../Button";
+import Title from "../../Widgets/Title";
+import { render } from "react-dom";
 
 interface QuickAnalysisFormPropsInterface {
 	action: string;
@@ -28,7 +28,7 @@ const QuickAnalysisForm: React.FC<QuickAnalysisFormPropsInterface> = (props) => 
 		<>
 			<div className="p-4 text-left mt-12">
 				<div className="text-center">
-					<Title name="Analyse Rapide"/>
+					<Title name="Analyse Rapide" />
 				</div>
 				<form method="post" action={githubUrl}>
 					<div className="w-4/5">

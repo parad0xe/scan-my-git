@@ -8,14 +8,22 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}
-        {% endblock %}
-
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <nav class="bg-navColor shadow-lg h-50 px-5">
+            <div class="flex items-center">
+                <img src="{{ asset("build/images/logo.png") }}" alt="logo Scan My Git">
+                <span class="text-lg text-white font-bold m-2">Scan My Git</span>
+            </div>
+        </nav>
+        <div class="w-4/5 flex flex-col items-center m-auto">
+            {% block body %}
+            {% endblock %}
+        </div>
+        
         {{ encore_entry_script_tags('app') }}
 
         {% block javascripts %}
         {% endblock %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </body>
 </html>
 
