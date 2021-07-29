@@ -20,9 +20,6 @@ class Proxy__ModuleEntity__ {
     private CliParametersNode $cli_parameters;
     private FormBuilder $fb;
 
-    /**
-     * @throws FileNotFoundException
-     */
     public function __construct(
         private Module $module
     ) {

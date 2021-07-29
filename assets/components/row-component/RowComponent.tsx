@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import { render } from "react-dom";
-import arrow from './../img/arrow-right.png';
+import arrow from '../../img/arrow-right.png';
 import parse from 'html-react-parser'
 
 

@@ -1,18 +1,18 @@
 import React, {useEffect, useRef, useState} from "react";
 import { render } from "react-dom";
 
-interface LoadingCirclePropsInterface {
+interface LoadingCircleComponentPropsInterface {
 	width?: string;
 	bgcolor?: string;
 	fcolor?: string;
 	start?: string;
 	progress: string;
-	element: LoadingCircleElement;
+	element: LoadingCircleComponentElement;
 	stroke?: string;
 	text?: string;
 }
 
-const LoadingCircle: React.FC<LoadingCirclePropsInterface> = (
+const LoadingCircleComponent: React.FC<LoadingCircleComponentPropsInterface> = (
 	props
 ) => {
 	const width = parseInt(props.width, 10);
@@ -88,7 +88,7 @@ const LoadingCircle: React.FC<LoadingCirclePropsInterface> = (
 };
 
 
-class LoadingCircleElement extends HTMLElement {
+class LoadingCircleComponentElement extends HTMLElement {
 	setProgress: CallableFunction;
 	setText: CallableFunction;
 
@@ -105,8 +105,8 @@ class LoadingCircleElement extends HTMLElement {
 		const stroke = this.getAttribute("stroke") ?? "10";
 		const progress = this.getAttribute("progress") ?? "0";
 		const text = this.getAttribute("text") ?? "";
-		render(<LoadingCircle width={width} bgcolor={bgcolor} fcolor={fcolor} stroke={stroke} text={text} start={start} progress={progress} element={this} />, this);
+		render(<LoadingCircleComponent width={width} bgcolor={bgcolor} fcolor={fcolor} stroke={stroke} text={text} start={start} progress={progress} element={this} />, this);
 	}
 }
 
-customElements.define("loading-circle", LoadingCircleElement);
+customElements.define("loading-circle-component", LoadingCircleComponentElement);
