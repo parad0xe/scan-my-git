@@ -3,26 +3,38 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %} Symfony! {% endblock %}</title>
+
         {{ encore_entry_link_tags('app') }}
+        
         {% block stylesheets %}
         {% endblock %}
     </head>
+    
     <body>
-        <nav class="bg-navColor shadow-lg h-50 px-5">
-            <div class="flex items-center">
-                <img src="{{ asset("build/images/logo.png") }}" alt="logo Scan My Git">
-                <span class="text-lg text-white font-bold m-2">Scan My Git</span>
-            </div>
-        </nav>
-        <div class="w-4/5 flex flex-col items-center m-auto">
-            {% block body %}
-            {% endblock %}
-        </div>
+      <navbar-application></navbar-application>
+      
+      <div class="w-4/5 flex flex-col items-center m-auto">
+          {% for flash_message in app.session.flashbag.get('error') %}
+              <div class="alert alert-danger">
+                  {{ flash_message }}
+              </div>
+          {% endfor %}
+
+          {% for flash_message in app.session.flashbag.get('success') %}
+              <div class="alert alert-success">
+                  {{ flash_message }}
+              </div>
+          {% endfor %}
+          
+          {% block body %}
+          {% endblock %}
+      </div>
         
         {{ encore_entry_script_tags('app') }}
 
         {% block javascripts %}
         {% endblock %}
+        
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </body>
 </html>
