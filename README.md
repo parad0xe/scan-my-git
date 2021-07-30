@@ -75,13 +75,13 @@ docker-compose exec php-fpm php bin/console doctrine:fixtures:load
 
 Pour contribuer au développement de l'application, veuillez suivre les instructions suivantes:
 
-Déplacer vous sur la branche `develop`:
+Déplacez vous sur la branche `develop`:
 
 ```bash
 git checkout develop
 ```
 
-Créer une nouvelle pour votre fonctionnalité:
+Créer une nouvelle branche pour votre fonctionnalité:
 
 ```bash
 git checkout -b feature/<nom-de-votre-fonctionnalité>
